@@ -1,0 +1,69 @@
+
+import React, { useEffect, useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { ArrowDown } from "lucide-react";
+
+const HeroSection = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  const scrollToCheckout = () => {
+    const checkout = document.getElementById('checkout');
+    if (checkout) {
+      checkout.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section className="min-h-screen flex flex-col justify-center items-center pt-20 pb-16 px-4 relative overflow-hidden">
+      {/* Background elements */}
+      <div className="absolute inset-0 -z-10 bg-dark">
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-hero/20 rounded-full filter blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full filter blur-3xl"></div>
+      </div>
+      
+      <div 
+        className={`max-w-5xl mx-auto text-center transition-all duration-1000 transform ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+        }`}
+      >
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold mb-4 text-light">
+          Escape Freelance Burnout —<br />
+          <span className="text-hero block mt-2">Get Paid on Autopilot</span>
+          <span className="text-accent block mt-2 h-16 md:h-auto">with One System.</span>
+        </h1>
+
+        <div className="my-8 h-12 overflow-hidden">
+          <h2 className="typewriter text-xl md:text-2xl font-heading">
+            Build Once. Sell Forever.
+          </h2>
+        </div>
+
+        <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-light/90">
+          Discover the blueprint that built $20K+ months using Make.com + Airtable —<br className="hidden md:block" /> 
+          <span className="font-bold">no code, no team, no burnout. Just results.</span>
+        </p>
+        
+        <div className="mt-8">
+          <Button 
+            onClick={scrollToCheckout} 
+            size="lg" 
+            className="btn-action animate-float text-lg"
+          >
+            🔵 Get the Automation Blueprint — $9.99
+          </Button>
+          
+          <div className="mt-16 animate-bounce">
+            <ArrowDown className="mx-auto text-light/50" size={32} />
+            <p className="text-sm text-light/50 mt-2">Scroll to learn more</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default HeroSection;

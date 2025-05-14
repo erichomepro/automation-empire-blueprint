@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Custom colors for Automation Empire
+				hero: "#1E90FF",    // Electric Blue
+				accent: "#39FF14",  // Neon Green
+				dark: "#121212",    // Dark Charcoal
+				light: "#FAFAFA",   // Text Contrast
+			},
+			fontFamily: {
+				'heading': ['"Bebas Neue"', 'sans-serif'],
+				'body': ['"Open Sans"', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +94,35 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'typewriter': {
+					from: { width: '0' },
+					to: { width: '100%' },
+				},
+				'blink': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0' }
+				},
+				'glow': {
+					'0%, 100%': { 
+						boxShadow: '0 0 15px #39FF14, 0 0 30px #39FF14',
+					},
+					'50%': {
+						boxShadow: '0 0 25px #39FF14, 0 0 50px #39FF14',
+					}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-10px)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'typewriter': 'typewriter 4s steps(40) forwards',
+				'blink': 'blink 1s infinite',
+				'glow': 'glow 2s ease-in-out infinite',
+				'float': 'float 6s ease-in-out infinite'
 			}
 		}
 	},
