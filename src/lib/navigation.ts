@@ -1,6 +1,6 @@
 
 import { NavigateFunction } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
 /**
  * Sanitizes a URL path, fixing backslashes and ensuring proper format
@@ -36,7 +36,11 @@ export const safeNavigate = (navigate: NavigateFunction, path: string): boolean 
     return true;
   } catch (error) {
     console.error("Navigation error:", error);
-    toast.debug(`Navigation error: ${error instanceof Error ? error.message : String(error)}`);
+    toast({
+      title: "Debug Info",
+      description: `Navigation error: ${error instanceof Error ? error.message : String(error)}`,
+      duration: 5000,
+    });
     
     // Fallback for navigation errors
     try {
@@ -76,7 +80,11 @@ export const safeScrollToElement = (
     }
   } catch (error) {
     console.error(`Error scrolling to #${elementId}:`, error);
-    toast.debug(`Scroll error: ${error instanceof Error ? error.message : String(error)}`);
+    toast({
+      title: "Debug Info",
+      description: `Scroll error: ${error instanceof Error ? error.message : String(error)}`,
+      duration: 5000,
+    });
     
     // If a fallback path is provided, try to navigate there
     if (fallbackPath && navigate) {

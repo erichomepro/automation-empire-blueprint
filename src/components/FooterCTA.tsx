@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
 
 const FooterCTA = () => {
   const { ref, inView } = useInView({
@@ -25,7 +25,11 @@ const FooterCTA = () => {
       navigate('/checkout');
     } catch (error) {
       console.error("Navigation error:", error);
-      toast.debug(`Navigation error: ${error instanceof Error ? error.message : String(error)}`);
+      toast({
+        title: "Debug Info",
+        description: `Navigation error: ${error instanceof Error ? error.message : String(error)}`,
+        duration: 5000,
+      });
       // Ultimate fallback - use location.href
       try {
         // Simple path sanitization

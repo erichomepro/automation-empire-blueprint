@@ -1,7 +1,7 @@
 
 import { useToast as hookUseToast, toast as hookToast, type ToasterToast } from "@/hooks/use-toast";
 
-// Create an extended version of toast with our debug method
+// Create an interface for our extended toast type
 interface ExtendedToast {
   (props: Omit<ToasterToast, "id">): {
     id: string;
@@ -15,7 +15,7 @@ interface ExtendedToast {
   };
 }
 
-// Convert the original toast to our extended type
+// Convert the original toast to our extended type and add the debug method
 const toast = hookToast as unknown as ExtendedToast;
 
 // Add a debug method for showing visible mobile toast notifications

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { toast } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -50,7 +50,11 @@ const HeroSection = () => {
       }
     } catch (error) {
       console.error("Error during scrolling:", error);
-      toast.debug(`Navigation error: ${error instanceof Error ? error.message : String(error)}`);
+      toast({
+        title: "Debug Info",
+        description: `Navigation error: ${error instanceof Error ? error.message : String(error)}`,
+        duration: 5000,
+      });
       
       // Ultimate fallback - use a simple redirection
       try {
