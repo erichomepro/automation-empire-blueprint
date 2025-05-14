@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -20,12 +20,7 @@ const Navbar = () => {
         // If we're trying to navigate to checkout and the element doesn't exist
         if (elementId === 'checkout') {
           console.log('Checkout element not found, navigating to /checkout page');
-          // @ts-ignore - Using the global safe navigate function
-          if (window.safeNavigate && navigate) {
-            window.safeNavigate(navigate, '/checkout');
-          } else {
-            navigate('/checkout');
-          }
+          navigate('/checkout');
         }
       }
     } catch (error) {

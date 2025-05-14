@@ -28,35 +28,6 @@ const sanitizePath = (path: string): string => {
   return sanitized;
 };
 
-// Make the sanitizePath function globally available for debugging
-// @ts-ignore
-window.sanitizePath = sanitizePath;
-
-// Create a safe navigation wrapper function
-const safeNavigate = (navigate: NavigateFunction, path: string) => {
-  try {
-    const sanitized = sanitizePath(path);
-    console.log(`Safe navigating to: ${sanitized}`);
-    navigate(sanitized);
-    return true;
-  } catch (error) {
-    console.error("Navigation error:", error);
-    // Fallback for navigation errors
-    try {
-      window.location.href = sanitizePath(path);
-      return true;
-    } catch (e) {
-      console.error("Critical navigation error:", e);
-      window.location.href = "/";
-      return false;
-    }
-  }
-};
-
-// Make the safeNavigate function globally available for all components
-// @ts-ignore
-window.safeNavigate = safeNavigate;
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

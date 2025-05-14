@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/toast";
 
 const FooterCTA = () => {
   const { ref, inView } = useInView({
@@ -21,21 +21,15 @@ const FooterCTA = () => {
   const handleCheckout = () => {
     try {
       console.log("Navigate to checkout");
-      // Use the global safe navigation function if available
-      // @ts-ignore - Using the global safe navigate function
-      if (window.safeNavigate && navigate) {
-        window.safeNavigate(navigate, '/checkout');
-      } else {
-        // Fallback to direct navigation
-        navigate('/checkout');
-      }
+      // Direct navigation with error handling
+      navigate('/checkout');
     } catch (error) {
       console.error("Navigation error:", error);
       toast.debug(`Navigation error: ${error instanceof Error ? error.message : String(error)}`);
       // Ultimate fallback - use location.href
       try {
-        // @ts-ignore - Using the global sanitize function
-        const safePath = window.sanitizePath ? window.sanitizePath('/checkout') : '/checkout';
+        // Simple path sanitization
+        const safePath = '/checkout'.replace(/\\/g, '/');
         window.location.href = safePath;
       } catch (e) {
         console.error("Critical navigation error:", e);

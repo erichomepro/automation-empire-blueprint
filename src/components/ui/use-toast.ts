@@ -1,5 +1,5 @@
 
-import { useToast, toast as hookToast, type ToasterToast } from "@/hooks/use-toast";
+import { useToast as hookUseToast, toast as hookToast, type ToasterToast } from "@/hooks/use-toast";
 
 // Create an extended version of toast with our debug method
 interface ExtendedToast {
@@ -16,7 +16,7 @@ interface ExtendedToast {
 }
 
 // Convert the original toast to our extended type
-const toast = hookToast as ExtendedToast;
+const toast = hookToast as unknown as ExtendedToast;
 
 // Add a debug method for showing visible mobile toast notifications
 toast.debug = (message: string) => {
@@ -28,4 +28,4 @@ toast.debug = (message: string) => {
   });
 };
 
-export { useToast, toast };
+export { hookUseToast as useToast, toast };
