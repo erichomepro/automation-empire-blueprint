@@ -6,6 +6,12 @@ import './index.css'
 // For debugging blank screen issues
 console.log("Main.tsx is executing");
 
+// Mobile device detection
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+if (isMobile) {
+  console.log("Mobile device detected:", navigator.userAgent);
+}
+
 // Error boundary for better error visualization, especially on mobile
 const renderApp = () => {
   try {
@@ -44,6 +50,7 @@ const renderApp = () => {
         <h2>Something went wrong</h2>
         <p>Please try refreshing the page</p>
         <p style="font-size:12px;margin-top:20px;color:#888;">Error details: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+        <p style="font-size:10px;margin-top:10px;color:#888;">User agent: ${navigator.userAgent}</p>
       </div>
     `;
   }
@@ -58,6 +65,13 @@ window.addEventListener('DOMContentLoaded', () => {
 // Add global error handler for uncaught exceptions
 window.addEventListener('error', (event) => {
   console.error("Global error caught:", event.error);
+  
+  // Add mobile-specific information to errors
+  const errorDetails = `${event.message}\nURL: ${event.filename}:${event.lineno}:${event.colno}
+  ${isMobile ? `\nMobile device: ${navigator.userAgent}` : ''}`;
+  
+  console.error("Error details:", errorDetails);
+  
   const rootElement = document.getElementById("root");
   if (rootElement && rootElement.innerHTML === '') {
     rootElement.innerHTML = `
@@ -65,6 +79,7 @@ window.addEventListener('error', (event) => {
         <h2>Application Error</h2>
         <p>Please refresh the page</p>
         <p style="font-size:12px;margin-top:20px;color:#888;">Error: ${event.message}</p>
+        <p style="font-size:10px;margin-top:5px;color:#888;">${isMobile ? `Mobile device: ${navigator.userAgent}` : ''}</p>
       </div>
     `;
   }

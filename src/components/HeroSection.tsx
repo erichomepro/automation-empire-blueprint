@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { toast } from "@/components/ui/use-toast";
+import { safeScrollToElement } from "@/lib/utils";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -35,36 +35,7 @@ const HeroSection = () => {
 
   const scrollToCheckout = () => {
     console.log("Scroll to checkout clicked");
-    try {
-      const checkout = document.getElementById('checkout');
-      if (checkout) {
-        console.log("Checkout element found, scrolling");
-        checkout.scrollIntoView({ behavior: 'smooth' });
-        console.log("Scroll completed");
-      } else {
-        console.warn("Checkout element not found");
-        console.log("Navigating to checkout page instead");
-        
-        // Direct navigation with error handling
-        navigate('/checkout');
-      }
-    } catch (error) {
-      console.error("Error during scrolling:", error);
-      toast({
-        title: "Debug Info",
-        description: `Navigation error: ${error instanceof Error ? error.message : String(error)}`,
-        duration: 5000,
-      });
-      
-      // Ultimate fallback - use a simple redirection
-      try {
-        const safePath = '/checkout'.replace(/\\/g, '/');
-        window.location.href = safePath;
-      } catch (e) {
-        console.error("Critical navigation error:", e);
-        window.location.href = '/';
-      }
-    }
+    safeScrollToElement('checkout', navigate, '/checkout');
   };
 
   return (

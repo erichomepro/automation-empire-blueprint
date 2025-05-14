@@ -2,35 +2,14 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { toast } from "@/components/ui/use-toast";
+import { safeScrollToElement } from "@/lib/utils";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
-  const safeScrollToElement = (elementId: string) => {
-    try {
-      console.log(`Attempting to scroll to element: #${elementId}`);
-      const element = document.getElementById(elementId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-        console.log(`Successfully scrolled to #${elementId}`);
-      } else {
-        console.warn(`Element not found: #${elementId}`);
-        
-        // If we're trying to navigate to checkout and the element doesn't exist
-        if (elementId === 'checkout') {
-          console.log('Checkout element not found, navigating to /checkout page');
-          navigate('/checkout');
-        }
-      }
-    } catch (error) {
-      console.error(`Error scrolling to #${elementId}:`, error);
-      toast({
-        title: "Debug Info",
-        description: `Navigation error: ${error instanceof Error ? error.message : String(error)}`,
-        duration: 5000,
-      });
-    }
+  const handleNavigation = (elementId: string) => {
+    // Use our centralized utility with fallback path
+    safeScrollToElement(elementId, navigate, elementId === 'checkout' ? '/checkout' : undefined);
   };
 
   return (
@@ -44,35 +23,35 @@ const Navbar = () => {
             <Button 
               variant="ghost" 
               className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => safeScrollToElement('features')}
+              onClick={() => handleNavigation('features')}
             >
               Features
             </Button>
             <Button 
               variant="ghost" 
               className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => safeScrollToElement('who-is-it-for')}
+              onClick={() => handleNavigation('who-is-it-for')}
             >
               Who It's For
             </Button>
             <Button 
               variant="ghost" 
               className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => safeScrollToElement('what-you-get')}
+              onClick={() => handleNavigation('what-you-get')}
             >
               What You Get
             </Button>
             <Button 
               variant="ghost" 
               className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => safeScrollToElement('faq')}
+              onClick={() => handleNavigation('faq')}
             >
               FAQ
             </Button>
           </nav>
           <Button 
             className="bg-accent text-dark font-bold hover:bg-opacity-90 transition-all"
-            onClick={() => safeScrollToElement('checkout')}
+            onClick={() => handleNavigation('checkout')}
           >
             Get Started
           </Button>
