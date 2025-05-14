@@ -18,24 +18,24 @@ const FooterCTA = () => {
   };
 
   return (
-    <section className="section py-16 bg-dark">
+    <section className="section py-12 md:py-16 bg-dark px-4">
       <div 
         ref={ref}
         className={`max-w-3xl mx-auto text-center transition-all duration-700 ${
           inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}
       >
-        <h2 className="text-2xl md:text-3xl font-heading mb-4">
+        <h2 className="text-xl md:text-3xl font-heading mb-4">
           Still Reading? That's Your Sign.
         </h2>
-        <p className="text-xl mb-8 text-light/90">
+        <p className="text-lg md:text-xl mb-6 md:mb-8 text-light/90">
           One automation away from your new life.
         </p>
         
         <Button 
           onClick={handleCheckout}
           size="lg" 
-          className="btn-action"
+          className="btn-action w-full md:w-auto"
         >
           Let's Build Your Empire <ArrowRight className="ml-2" size={18} />
         </Button>

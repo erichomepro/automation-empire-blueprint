@@ -13,8 +13,16 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: '2rem',
+			padding: {
+				DEFAULT: '1rem',
+				sm: '2rem',
+				lg: '2rem',
+			},
 			screens: {
+				'sm': '640px',
+				'md': '768px',
+				'lg': '1024px',
+				'xl': '1280px',
 				'2xl': '1400px'
 			}
 		},
@@ -123,7 +131,16 @@ export default {
 				'blink': 'blink 1s infinite',
 				'glow': 'glow 2s ease-in-out infinite',
 				'float': 'float 6s ease-in-out infinite'
-			}
+			},
+			// Add viewport height fixes for mobile
+			height: {
+				'screen': '100vh',
+				'svh': '100svh', // Use smooth viewport height for mobile
+			},
+			minHeight: {
+				'screen': '100vh',
+				'svh': '100svh',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
