@@ -72,11 +72,21 @@ const PaymentSuccess = () => {
     // If you had a real download link from Make.com stored in the database:
     if (purchaseId) {
       try {
-        // Update download count - fixing the type error here
+        // Get the current download count
+        const { data: purchaseData } = await supabase
+          .from('ebook_purchases')
+          .select('download_count')
+          .eq('id', purchaseId)
+          .maybeSingle();
+        
+        // Increment the download count directly
+        const newCount = (purchaseData?.download_count || 0) + 1;
+        
+        // Update the download count and last_downloaded timestamp
         await supabase
           .from('ebook_purchases')
           .update({
-            download_count: supabase.rpc('increment', { x: 1 }).data,
+            download_count: newCount,
             last_downloaded: new Date().toISOString()
           })
           .eq('id', purchaseId);
