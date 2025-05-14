@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { Code, RefreshCw, PuzzlePiece, BrainCircuit, Package2, Video } from 'lucide-react';
+import { Code, RefreshCw, Puzzle, BrainCircuit, Package2, Video } from 'lucide-react';
 
 const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => {
   const { ref, inView } = useInView({
@@ -35,7 +35,7 @@ const FeaturesSection = () => {
       description: "Create systems that run themselves, freeing your time and expanding your income"
     },
     {
-      icon: PuzzlePiece,
+      icon: Puzzle,
       title: "Resell working systems",
       description: "Package your automations as products and sell them to business owners repeatedly"
     },
