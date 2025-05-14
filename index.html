@@ -3,11 +3,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Automation Empire | Escape Freelance Burnout</title>
     <meta name="description" content="Discover the blueprint that built $20K+ months using Make.com + Airtable — no code, no team, no burnout. Just results." />
     <meta name="author" content="Eric Wick" />
 
+    <!-- Force hardware acceleration on mobile for smoother rendering -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Open Graph / Social Media Meta Tags -->
     <meta property="og:title" content="Automation Empire | Escape Freelance Burnout" />
     <meta property="og:description" content="Discover the blueprint that built $20K+ months using Make.com + Airtable — no code, no team, no burnout. Just results." />
     <meta property="og:type" content="website" />
@@ -21,10 +27,48 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Inline critical CSS to ensure something renders even if stylesheets fail -->
+    <style>
+      body {
+        background-color: #121212;
+        color: #FAFAFA;
+        font-family: 'Open Sans', sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      .fallback-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+        padding: 1rem;
+      }
+    </style>
   </head>
 
   <body>
-    <div id="root"></div>
+    <!-- Fallback content that shows if JavaScript fails completely -->
+    <noscript>
+      <div class="fallback-content">
+        <h1>JavaScript Required</h1>
+        <p>Please enable JavaScript to view this application.</p>
+      </div>
+    </noscript>
+    
+    <!-- Root element for React -->
+    <div id="root">
+      <!-- Initial loading state visible before JS loads -->
+      <div class="fallback-content">
+        <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; margin-bottom: 1rem;">
+          Automation Empire
+        </h1>
+        <p>Loading application...</p>
+      </div>
+    </div>
+    
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>

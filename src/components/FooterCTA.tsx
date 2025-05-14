@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
@@ -13,7 +13,12 @@ const FooterCTA = () => {
   
   const navigate = useNavigate();
 
+  useEffect(() => {
+    console.log("FooterCTA component mounted");
+  }, []);
+
   const handleCheckout = () => {
+    console.log("Navigate to checkout");
     navigate('/checkout');
   };
 
