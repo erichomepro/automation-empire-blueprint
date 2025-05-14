@@ -1,8 +1,12 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
+import { toast } from "@/hooks/use-toast";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   const safeScrollToElement = (elementId: string) => {
     try {
       console.log(`Attempting to scroll to element: #${elementId}`);
@@ -12,9 +16,21 @@ const Navbar = () => {
         console.log(`Successfully scrolled to #${elementId}`);
       } else {
         console.warn(`Element not found: #${elementId}`);
+        
+        // If we're trying to navigate to checkout and the element doesn't exist
+        if (elementId === 'checkout') {
+          console.log('Checkout element not found, navigating to /checkout page');
+          // @ts-ignore - Using the global safe navigate function
+          if (window.safeNavigate && navigate) {
+            window.safeNavigate(navigate, '/checkout');
+          } else {
+            navigate('/checkout');
+          }
+        }
       }
     } catch (error) {
       console.error(`Error scrolling to #${elementId}:`, error);
+      toast.debug(`Navigation error: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 

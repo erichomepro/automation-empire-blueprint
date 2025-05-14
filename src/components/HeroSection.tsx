@@ -2,10 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
+import { toast } from "@/hooks/use-toast";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const navigate = useNavigate();
   
   // Debug loading on mobile
   console.log("HeroSection rendering");
@@ -40,18 +43,30 @@ const HeroSection = () => {
         console.log("Scroll completed");
       } else {
         console.warn("Checkout element not found");
-        // Fallback - safely scroll down 100vh
-        console.log("Using fallback scrolling");
-        window.scrollBy({
-          top: window.innerHeight,
-          behavior: 'smooth'
-        });
+        console.log("Navigating to checkout page instead");
+        
+        // Use safe navigation if available
+        // @ts-ignore - Using the global safe navigate function
+        if (window.safeNavigate && navigate) {
+          window.safeNavigate(navigate, '/checkout');
+        } else {
+          // Fallback to direct navigation
+          navigate('/checkout');
+        }
       }
     } catch (error) {
       console.error("Error during scrolling:", error);
-      // Ultimate fallback - just go to the checkout page
-      console.log("Navigation fallback to /checkout");
-      window.location.href = '/checkout';
+      toast.debug(`Navigation error: ${error instanceof Error ? error.message : String(error)}`);
+      
+      // Ultimate fallback - use a simple redirection
+      try {
+        // @ts-ignore - Using the global sanitize function
+        const safePath = window.sanitizePath ? window.sanitizePath('/checkout') : '/checkout';
+        window.location.href = safePath;
+      } catch (e) {
+        console.error("Critical navigation error:", e);
+        window.location.href = '/';
+      }
     }
   };
 
