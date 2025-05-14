@@ -12,46 +12,30 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function sanitizePath(path: string): string {
   if (!path) return "/";
-  
-  try {
-    // Ensure we're working with a string
-    let sanitized = String(path);
-    
-    // Check if this is an iOS device for extra logging
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isIOS) {
-      console.log(`iOS device detected, sanitizing path: '${path}'`);
-    }
-    
-    // Aggressively replace all backslashes with forward slashes
-    while (sanitized.includes('\\')) {
-      sanitized = sanitized.replace(/\\/g, '/');
-    }
-    
-    // Remove any double slashes (except for http:// or https://)
-    sanitized = sanitized.replace(/([^:])\/\/+/g, '$1/');
-    
-    // Ensure the path starts with a slash for relative paths
-    if (!sanitized.startsWith('/') && !sanitized.startsWith('http')) {
-      sanitized = '/' + sanitized;
-    }
-    
-    // Additional mobile safety checks
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      // Final verification for any remaining backslashes
-      if (sanitized.includes('\\')) {
-        console.error(`Critical: Path still contains backslashes after sanitization: '${sanitized}'`);
-        return '/'; // Return home as safeguard
-      }
-    }
-    
-    console.log(`Path sanitized from '${path}' to '${sanitized}'`);
-    return sanitized;
-  } catch (error) {
-    console.error("Path sanitization error:", error);
-    // Fail safe: return home path
-    return '/';
+  let sanitized = path.trim().replace(/\\/g, '/');
+  sanitized = sanitized.replace(/([^:])\/\/+/g, '$1/');
+  if (!sanitized.startsWith('/')) sanitized = '/' + sanitized;
+  return encodeURI(sanitized);
+}
+
+/**
+ * Safely scrolls to an element by ID with fallback navigation
+ */
+export function safeScrollToElement(
+  id: string,
+  navigate: NavigateFunction,
+  fallbackPath?: string
+) {
+  const target = document.getElementById(id);
+
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  } else if (fallbackPath) {
+    const cleanPath = sanitizePath(fallbackPath);
+    console.log(`[safeScrollToElement] Navigating to fallback: ${cleanPath}`);
+    navigate(cleanPath);
+  } else {
+    console.warn(`[safeScrollToElement] Element '${id}' not found and no fallback provided.`);
   }
 }
 
@@ -88,50 +72,6 @@ export function safeNavigate(navigate: NavigateFunction, path: string): void {
     } catch (e) {
       console.error("Critical navigation error, redirecting to home:", e);
       window.location.href = '/';
-    }
-  }
-}
-
-/**
- * Safely scrolls to an element by ID with fallback navigation
- */
-export function safeScrollToElement(
-  elementId: string, 
-  navigate?: NavigateFunction, 
-  fallbackPath?: string
-): void {
-  try {
-    // Sanitize element ID to prevent issues
-    const safeId = elementId.replace(/[^\w-]/g, '');
-    
-    console.log(`Attempting to scroll to element: #${safeId}`);
-    const element = document.getElementById(safeId);
-    
-    if (element) {
-      // Element found, scroll to it
-      element.scrollIntoView({ behavior: 'smooth' });
-      console.log(`Successfully scrolled to #${safeId}`);
-    } else {
-      console.warn(`Element #${safeId} not found`);
-      
-      // If we have navigation fallback info, use it
-      if (fallbackPath && navigate) {
-        // CRITICAL FIX: Always sanitize the fallback path before navigation
-        const sanitizedPath = sanitizePath(fallbackPath);
-        console.log(`Element not found, navigating to sanitized path: ${sanitizedPath}`);
-        
-        // Use our safe navigation function
-        safeNavigate(navigate, sanitizedPath);
-      }
-    }
-  } catch (error) {
-    console.error(`Error scrolling to #${elementId}:`, error);
-    
-    // If we have navigation fallback info, use it
-    if (fallbackPath && navigate) {
-      // CRITICAL FIX: Always sanitize the fallback path before navigation
-      const sanitizedPath = sanitizePath(fallbackPath);
-      safeNavigate(navigate, sanitizedPath);
     }
   }
 }
