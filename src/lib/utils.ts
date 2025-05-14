@@ -15,6 +15,12 @@ export function sanitizePath(path: string): string {
   let sanitized = path.trim().replace(/\\/g, '/');
   sanitized = sanitized.replace(/([^:])\/\/+/g, '$1/');
   if (!sanitized.startsWith('/')) sanitized = '/' + sanitized;
+  
+  // Add mobile device logging to help with debugging
+  if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+    console.log(`[MOBILE SANITIZE] Path from '${path}' to '${sanitized}'`);
+  }
+  
   return encodeURI(sanitized);
 }
 
@@ -33,6 +39,12 @@ export function safeScrollToElement(
   } else if (fallbackPath) {
     const cleanPath = sanitizePath(fallbackPath);
     console.log(`[safeScrollToElement] Navigating to fallback: ${cleanPath}`);
+    
+    // Add mobile-specific logging for debugging
+    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+      console.log("[MOBILE NAVIGATION] Clean path to:", cleanPath);
+    }
+    
     navigate(cleanPath);
   } else {
     console.warn(`[safeScrollToElement] Element '${id}' not found and no fallback provided.`);
@@ -52,6 +64,9 @@ export function safeNavigate(navigate: NavigateFunction, path: string): void {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
     if (isMobile) {
+      // Additional logging for mobile devices
+      console.log("[MOBILE NAVIGATION] Clean path to:", safePath);
+      
       // Additional validation for mobile devices
       if (safePath.includes('\\')) {
         console.error(`Mobile navigation error: Path contains backslashes: ${safePath}`);
