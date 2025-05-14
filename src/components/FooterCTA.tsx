@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { safeNavigate } from "@/lib/utils";
+import { safeNavigate, sanitizePath } from "@/lib/utils";
 
 const FooterCTA = () => {
   const { ref, inView } = useInView({
@@ -19,8 +19,10 @@ const FooterCTA = () => {
   }, []);
 
   const handleCheckout = () => {
-    console.log("Navigate to checkout");
-    safeNavigate(navigate, '/checkout');
+    // Always use sanitized paths and our enhanced navigation utility
+    const sanitizedPath = sanitizePath('/checkout');
+    console.log("Footer CTA: Navigate to sanitized checkout path:", sanitizedPath);
+    safeNavigate(navigate, sanitizedPath);
   };
 
   return (

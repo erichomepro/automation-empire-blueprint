@@ -23,8 +23,10 @@ export function sanitizePath(path: string): string {
       console.log(`iOS device detected, sanitizing path: '${path}'`);
     }
     
-    // Always use forward slashes, never backslashes
-    sanitized = sanitized.replace(/\\/g, '/');
+    // Aggressively replace all backslashes with forward slashes
+    while (sanitized.includes('\\')) {
+      sanitized = sanitized.replace(/\\/g, '/');
+    }
     
     // Remove any double slashes (except for http:// or https://)
     sanitized = sanitized.replace(/([^:])\/\/+/g, '$1/');
@@ -34,13 +36,17 @@ export function sanitizePath(path: string): string {
       sanitized = '/' + sanitized;
     }
     
-    // Handle special case for iOS where literal backslashes might be present in string
-    if (sanitized.includes('\\')) {
-      console.warn(`Path still contains backslashes after replacement: '${sanitized}'`);
-      sanitized = sanitized.split('\\').join('/');
+    // Additional mobile safety checks
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      // Final verification for any remaining backslashes
+      if (sanitized.includes('\\')) {
+        console.error(`Critical: Path still contains backslashes after sanitization: '${sanitized}'`);
+        return '/'; // Return home as safeguard
+      }
     }
     
-    console.log(`Path sanitized: '${path}' → '${sanitized}'`);
+    console.log(`Path sanitized from '${path}' to '${sanitized}'`);
     return sanitized;
   } catch (error) {
     console.error("Path sanitization error:", error);
@@ -78,25 +84,7 @@ export function safeNavigate(navigate: NavigateFunction, path: string): void {
     // Fallback to location.href for critical errors but ensure path is safe
     try {
       let fallbackPath = '/'; // Default to home
-      // Only attempt to sanitize if the original path is available
-      if (typeof path === 'string') {
-        fallbackPath = sanitizePath(path);
-        // Double-check it's valid
-        if (fallbackPath.includes('\\')) {
-          fallbackPath = '/';
-        }
-      }
-      
-      console.log(`Fallback navigation to: ${fallbackPath}`);
-      
-      // Use safer history.pushState instead of direct location.href assignment
-      if (window.history) {
-        window.history.pushState({}, '', fallbackPath);
-        window.dispatchEvent(new Event('popstate'));
-      } else {
-        // Last resort
-        window.location.href = fallbackPath;
-      }
+      window.location.href = fallbackPath;
     } catch (e) {
       console.error("Critical navigation error, redirecting to home:", e);
       window.location.href = '/';
@@ -128,8 +116,12 @@ export function safeScrollToElement(
       
       // If we have navigation fallback info, use it
       if (fallbackPath && navigate) {
-        console.log(`Element not found, navigating to: ${fallbackPath}`);
-        safeNavigate(navigate, fallbackPath);
+        // CRITICAL FIX: Always sanitize the fallback path before navigation
+        const sanitizedPath = sanitizePath(fallbackPath);
+        console.log(`Element not found, navigating to sanitized path: ${sanitizedPath}`);
+        
+        // Use our safe navigation function
+        safeNavigate(navigate, sanitizedPath);
       }
     }
   } catch (error) {
@@ -137,7 +129,9 @@ export function safeScrollToElement(
     
     // If we have navigation fallback info, use it
     if (fallbackPath && navigate) {
-      safeNavigate(navigate, fallbackPath);
+      // CRITICAL FIX: Always sanitize the fallback path before navigation
+      const sanitizedPath = sanitizePath(fallbackPath);
+      safeNavigate(navigate, sanitizedPath);
     }
   }
 }

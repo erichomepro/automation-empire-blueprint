@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { safeScrollToElement } from "@/lib/utils";
+import { safeScrollToElement, sanitizePath } from "@/lib/utils";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -35,7 +35,9 @@ const HeroSection = () => {
 
   const scrollToCheckout = () => {
     console.log("Scroll to checkout clicked");
-    safeScrollToElement('checkout', navigate, '/checkout');
+    // Always use sanitized paths for fallback navigation
+    const sanitizedPath = sanitizePath('/checkout');
+    safeScrollToElement('checkout', navigate, sanitizedPath);
   };
 
   return (
