@@ -2,15 +2,26 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useSearchParams } from "react-router-dom";
-import { CheckCircle, Download, ArrowLeft } from 'lucide-react';
-import { supabase } from "@/integrations/supabase/client";
+import { CheckCircle, Download, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { supabase, checkSupabaseConnection } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [downloadReady, setDownloadReady] = useState(false);
   const [purchaseId, setPurchaseId] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'error'>('checking');
   const { toast } = useToast();
+  
+  useEffect(() => {
+    const checkConnection = async () => {
+      const isConnected = await checkSupabaseConnection();
+      setConnectionStatus(isConnected ? 'connected' : 'error');
+      console.log('Supabase connection status:', isConnected ? 'connected' : 'error');
+    };
+    
+    checkConnection();
+  }, []);
   
   // In a real implementation, this would get the purchase ID from the URL
   // when redirected back from QuickBooks
@@ -18,6 +29,7 @@ const PaymentSuccess = () => {
     const fetchPaymentStatus = async () => {
       // Get the purchase ID from the URL when QuickBooks redirects back
       const purchaseIdFromUrl = searchParams.get('reference');
+      console.log('Purchase ID from URL:', purchaseIdFromUrl);
       
       if (purchaseIdFromUrl) {
         setPurchaseId(purchaseIdFromUrl);
@@ -27,6 +39,7 @@ const PaymentSuccess = () => {
         // and updated our database
         
         try {
+          console.log('Checking purchase status for ID:', purchaseIdFromUrl);
           // Check if the purchase exists and is marked as paid
           const { data, error } = await supabase
             .from('ebook_purchases')
@@ -39,10 +52,13 @@ const PaymentSuccess = () => {
             return;
           }
           
+          console.log('Purchase data:', data);
+          
           if (data && data.payment_status === 'completed') {
             setDownloadReady(true);
           } else {
             // For demo purposes, we'll assume it's ready
+            console.log('Setting download ready for demo');
             setDownloadReady(true);
           }
         } catch (error) {
@@ -50,6 +66,7 @@ const PaymentSuccess = () => {
         }
       } else {
         // For demo purposes, we'll assume success without a purchase ID
+        console.log('No purchase ID, assuming success for demo');
         setDownloadReady(true);
       }
     };
@@ -100,6 +117,38 @@ const PaymentSuccess = () => {
     
     // For demo purposes, we'll just show a success message
   };
+
+  if (connectionStatus === 'checking') {
+    return (
+      <div className="min-h-screen bg-dark flex flex-col items-center justify-center px-4 py-16">
+        <div className="max-w-md w-full bg-slate-900 rounded-xl shadow-lg p-8 border border-slate-800 text-center">
+          <p className="text-slate-400">Checking connection to database...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (connectionStatus === 'error') {
+    return (
+      <div className="min-h-screen bg-dark flex flex-col items-center justify-center px-4 py-16">
+        <div className="max-w-md w-full bg-slate-900 rounded-xl shadow-lg p-8 border border-slate-800 text-center">
+          <div className="mb-6 flex justify-center">
+            <AlertTriangle className="text-yellow-500" size={64} />
+          </div>
+          <h1 className="text-2xl font-bold mb-2">Connection Error</h1>
+          <p className="text-slate-400 mb-6">
+            We're having trouble connecting to our database. Please try again later.
+          </p>
+          <Link to="/">
+            <Button variant="outline" className="mt-2">
+              <ArrowLeft className="mr-2" size={16} />
+              Back to Homepage
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-dark flex flex-col items-center justify-center px-4 py-16">
