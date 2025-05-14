@@ -37,6 +37,45 @@ const App = () => {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     if (isMobile) {
       console.log("Mobile device detected:", navigator.userAgent);
+      
+      // Add global error handler specifically for mobile URL errors
+      window.addEventListener('error', (event) => {
+        // Check if this is a URL parsing error
+        if (event.message && event.message.includes("parsed as a URL")) {
+          console.error("URL parsing error detected:", event.message);
+          console.error("Error location:", event.filename, event.lineno, event.colno);
+          
+          // Display visible error for debugging
+          const errorEl = document.createElement('div');
+          errorEl.style.position = 'fixed';
+          errorEl.style.bottom = '50px';
+          errorEl.style.left = '0';
+          errorEl.style.right = '0';
+          errorEl.style.backgroundColor = 'rgba(255,0,0,0.8)';
+          errorEl.style.color = 'white';
+          errorEl.style.padding = '10px';
+          errorEl.style.textAlign = 'center';
+          errorEl.style.zIndex = '9999';
+          errorEl.textContent = `URL Error: ${event.message}`;
+          
+          document.body.appendChild(errorEl);
+          
+          // Remove after 5 seconds
+          setTimeout(() => {
+            if (errorEl.parentNode) {
+              errorEl.parentNode.removeChild(errorEl);
+            }
+          }, 5000);
+          
+          // Try to recover by navigating to home
+          try {
+            window.history.pushState({}, '', '/');
+            window.dispatchEvent(new Event('popstate'));
+          } catch (e) {
+            console.error("Failed to recover from URL error:", e);
+          }
+        }
+      });
     }
     
     // Add a global error handler specifically for URL parsing errors
@@ -68,8 +107,14 @@ const App = () => {
     window.history.pushState = function(state, title, url) {
       try {
         if (typeof url === 'string') {
-          // Always sanitize URLs
+          // Always sanitize URLs and ensure no backslashes
           url = sanitizePath(url);
+          
+          // Double check for iOS
+          if (isMobile && url.includes('\\')) {
+            console.error("Mobile pushState error: URL contains backslashes after sanitization:", url);
+            url = '/';
+          }
         }
         return originalPushState.call(this, state, title, url);
       } catch (e) {
