@@ -1,18 +1,44 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 const Checkout = () => {
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [product, setProduct] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Fetch product details on component mount
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('ebook_products')
+          .select('*')
+          .eq('sku', 'AE-EBOOK-001')
+          .single();
+          
+        if (error) {
+          console.error('Error fetching product:', error);
+          return;
+        }
+        
+        setProduct(data);
+      } catch (error) {
+        console.error('Failed to fetch product:', error);
+      }
+    };
+    
+    fetchProduct();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,24 +55,49 @@ const Checkout = () => {
     setLoading(true);
     
     try {
-      // In a real implementation, this would call a Supabase Edge Function
-      // to create a QuickBooks invoice and return the payment link
+      if (!product) {
+        throw new Error("Product information not available");
+      }
       
-      // Simulate API call for demo purposes
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Store the pending purchase in Supabase
+      const { data, error } = await supabase
+        .from('ebook_purchases')
+        .insert([
+          {
+            customer_name: fullName,
+            customer_email: email,
+            product_id: product.id,
+            amount: product.price,
+            payment_status: 'pending'
+          }
+        ])
+        .select()
+        .single();
       
-      // For demo purposes, we'll navigate to a success page
-      // In production, this would redirect to QuickBooks payment page
+      if (error) {
+        throw error;
+      }
+      
       toast({
         title: "Success!",
         description: "You'll be redirected to complete your payment.",
       });
       
+      // In a real implementation, this would redirect to a QuickBooks payment link
+      // with purchase ID as reference
+      
+      // For now, we'll simulate this by redirecting to the success page after a delay
+      // Replace this with actual QuickBooks integration when you have your payment link
       setTimeout(() => {
+        // You would replace this with your QuickBooks payment URL
+        // window.location.href = `YOUR_QUICKBOOKS_PAYMENT_URL?reference=${data.id}`;
+        
+        // For demo purposes:
         navigate('/payment-success');
-      }, 1000);
+      }, 1500);
+      
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('Payment setup error:', error);
       toast({
         title: "Payment setup failed",
         description: "There was a problem setting up your payment. Please try again.",
@@ -63,11 +114,11 @@ const Checkout = () => {
         <h1 className="text-2xl font-bold mb-6 text-center">Complete Your Purchase</h1>
         
         <div className="mb-6 p-4 bg-slate-800 rounded-lg">
-          <h2 className="text-lg font-semibold">Automation Empire</h2>
-          <p className="text-slate-400">The blueprint for $20K+ months using Make.com + Airtable</p>
+          <h2 className="text-lg font-semibold">{product?.title || 'Automation Empire'}</h2>
+          <p className="text-slate-400">{product?.description || 'The blueprint for $20K+ months using Make.com + Airtable'}</p>
           <div className="mt-2 flex justify-between items-center">
             <span className="text-sm text-slate-400">Price:</span>
-            <span className="text-xl font-bold">$297.00</span>
+            <span className="text-xl font-bold">${product?.price || '297.00'}</span>
           </div>
         </div>
         

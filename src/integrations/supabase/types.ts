@@ -474,6 +474,98 @@ export type Database = {
         }
         Relationships: []
       }
+      ebook_products: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_path: string | null
+          id: string
+          is_active: boolean | null
+          price: number
+          sku: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_path?: string | null
+          id?: string
+          is_active?: boolean | null
+          price: number
+          sku?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_path?: string | null
+          id?: string
+          is_active?: boolean | null
+          price?: number
+          sku?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      ebook_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_email: string
+          customer_name: string
+          download_count: number | null
+          download_link: string | null
+          id: string
+          last_downloaded: string | null
+          make_webhook_processed: boolean | null
+          payment_id: string | null
+          payment_status: string | null
+          product_id: string | null
+          purchase_date: string | null
+          quickbooks_reference: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          download_count?: number | null
+          download_link?: string | null
+          id?: string
+          last_downloaded?: string | null
+          make_webhook_processed?: boolean | null
+          payment_id?: string | null
+          payment_status?: string | null
+          product_id?: string | null
+          purchase_date?: string | null
+          quickbooks_reference?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          download_count?: number | null
+          download_link?: string | null
+          id?: string
+          last_downloaded?: string | null
+          make_webhook_processed?: boolean | null
+          payment_id?: string | null
+          payment_status?: string | null
+          product_id?: string | null
+          purchase_date?: string | null
+          quickbooks_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ebook_purchases_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ebook_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_funnel: {
         Row: {
           budget: string
