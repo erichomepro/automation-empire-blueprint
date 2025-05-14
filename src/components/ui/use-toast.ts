@@ -1,6 +1,5 @@
 
-import { useToast, toast as hookToast } from "@/hooks/use-toast";
-import type { ToasterToast } from "@/hooks/use-toast";
+import { useToast, toast as hookToast, type ToasterToast } from "@/hooks/use-toast";
 
 // Create an extended version of toast with our debug method
 interface ExtendedToast {
