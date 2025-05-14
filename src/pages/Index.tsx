@@ -11,6 +11,9 @@ import CTASection from '@/components/CTASection';
 import FooterCTA from '@/components/FooterCTA';
 import Footer from '@/components/Footer';
 import EmpowermentSection from '@/components/EmpowermentSection';
+import HighlightedTestimonial from '@/components/HighlightedTestimonial';
+import BookContentSection from '@/components/BookContentSection';
+import StickyCTABar from '@/components/StickyCTABar';
 
 const Index = () => {
   return (
@@ -18,8 +21,10 @@ const Index = () => {
       <Navbar />
       <main className="w-full overflow-x-hidden">
         <HeroSection />
+        <HighlightedTestimonial />
         <FeaturesSection />
         <WhoForSection />
+        <BookContentSection />
         <EmpowermentSection />
         <WhatYouGetSection />
         <SocialProofSection />
@@ -28,6 +33,7 @@ const Index = () => {
         <FooterCTA />
       </main>
       <Footer />
+      <StickyCTABar />
     </div>
   );
 };

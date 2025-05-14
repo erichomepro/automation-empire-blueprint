@@ -5,6 +5,7 @@ import { ArrowDown, BookOpen } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { navigateToSection } from "@/lib/navigation";
 import BookCoverSection from "@/components/BookCoverSection";
+import TrustBar from "@/components/TrustBar";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -59,14 +60,15 @@ const HeroSection = () => {
         <h2 className="text-lg md:text-xl font-bold mb-2 text-orange-400">EBOOK DOWNLOAD • 35+ PAGES OF ACTIONABLE CONTENT</h2>
         
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-4 text-light">
-          <span className="text-purple-300 block">THE AUTOMATED EMPIRE:</span>
-          <span className="text-orange-400 block mt-2">AI SYSTEMS</span>
-          <span className="text-sm md:text-lg text-light block mt-2">THE ULTIMATE PLAYBOOK FOR ENTREPRENEURS WHO WANT TIME, SCALE, AND SANITY</span>
+          {/* New headline test variant */}
+          <span className="text-purple-300 block">THE BLUEPRINT BEHIND</span>
+          <span className="text-orange-400 block mt-2">$20K MONTHS</span>
+          <span className="text-sm md:text-lg text-light block mt-2">AUTOMATE YOUR BUSINESS WITHOUT CODE — NO TEAM, NO BURNOUT, JUST RESULTS</span>
         </h1>
 
         <div className="my-6 md:my-8 h-12 overflow-hidden">
           <h2 className="typewriter text-xl md:text-2xl font-heading">
-            MAKE.COM IT ONCE. SELL IT FOREVER.
+            BUILD ONCE. SELL IT FOREVER.
           </h2>
         </div>
 
@@ -88,6 +90,16 @@ const HeroSection = () => {
                 <BookOpen className="mr-2" size={20} />
                 Get the Automation Blueprint — $9.99
               </Button>
+              
+              {/* Added benefit bullet under CTA button */}
+              <p className="text-light/80 mt-3 text-sm md:text-base">
+                🔁 Build once, automate forever. No code needed.
+              </p>
+            </div>
+            
+            {/* Added trust bar */}
+            <div className="mt-6">
+              <TrustBar />
             </div>
           </div>
         </div>
