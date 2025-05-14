@@ -10,6 +10,7 @@ import FAQSection from '@/components/FAQSection';
 import CTASection from '@/components/CTASection';
 import FooterCTA from '@/components/FooterCTA';
 import Footer from '@/components/Footer';
+import EmpowermentSection from '@/components/EmpowermentSection';
 
 const Index = () => {
   return (
@@ -19,6 +20,7 @@ const Index = () => {
         <HeroSection />
         <FeaturesSection />
         <WhoForSection />
+        <EmpowermentSection />
         <WhatYouGetSection />
         <SocialProofSection />
         <FAQSection />

@@ -2,20 +2,20 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { safeScrollToElement, sanitizePath } from "@/lib/utils";
+import { navigateToSection } from "@/lib/navigation";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
   const handleNavigation = (elementId: string) => {
     // Always use sanitized paths for navigation
-    const fallbackPath = elementId === 'checkout' ? sanitizePath('/checkout') : undefined;
+    const fallbackPath = elementId === 'checkout' ? '/checkout' : undefined;
     
     // Log navigation attempt for debugging
     console.log(`Navbar navigation: elementId=${elementId}, fallbackPath=${fallbackPath}`);
     
-    // Use our enhanced utility with sanitized fallback path
-    safeScrollToElement(elementId, navigate, fallbackPath);
+    // Use our centralized navigation utility
+    navigateToSection(elementId, navigate, fallbackPath);
   };
 
   return (
