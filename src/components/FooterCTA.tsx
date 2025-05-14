@@ -3,18 +3,18 @@ import React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const FooterCTA = () => {
   const { ref, inView } = useInView({
     threshold: 0.1,
     triggerOnce: true,
   });
+  
+  const navigate = useNavigate();
 
-  const scrollToCheckout = () => {
-    const checkout = document.getElementById('checkout');
-    if (checkout) {
-      checkout.scrollIntoView({ behavior: 'smooth' });
-    }
+  const handleCheckout = () => {
+    navigate('/checkout');
   };
 
   return (
@@ -33,7 +33,7 @@ const FooterCTA = () => {
         </p>
         
         <Button 
-          onClick={scrollToCheckout}
+          onClick={handleCheckout}
           size="lg" 
           className="btn-action"
         >
