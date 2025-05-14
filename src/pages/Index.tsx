@@ -14,7 +14,7 @@ import EmpowermentSection from '@/components/EmpowermentSection';
 
 const Index = () => {
   return (
-    <div className="min-h-screen w-full bg-dark overflow-x-hidden">
+    <div className="min-h-screen w-full bg-purple-950 overflow-x-hidden">
       <Navbar />
       <main className="w-full overflow-x-hidden">
         <HeroSection />
