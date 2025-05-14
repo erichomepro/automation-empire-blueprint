@@ -32,16 +32,26 @@ const HeroSection = () => {
 
   const scrollToCheckout = () => {
     console.log("Scroll to checkout clicked");
-    const checkout = document.getElementById('checkout');
-    if (checkout) {
-      checkout.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      console.warn("Checkout element not found");
-      // Fallback - just scroll down 100vh
-      window.scrollBy({
-        top: window.innerHeight,
-        behavior: 'smooth'
-      });
+    try {
+      const checkout = document.getElementById('checkout');
+      if (checkout) {
+        console.log("Checkout element found, scrolling");
+        checkout.scrollIntoView({ behavior: 'smooth' });
+        console.log("Scroll completed");
+      } else {
+        console.warn("Checkout element not found");
+        // Fallback - safely scroll down 100vh
+        console.log("Using fallback scrolling");
+        window.scrollBy({
+          top: window.innerHeight,
+          behavior: 'smooth'
+        });
+      }
+    } catch (error) {
+      console.error("Error during scrolling:", error);
+      // Ultimate fallback - just go to the checkout page
+      console.log("Navigation fallback to /checkout");
+      window.location.href = '/checkout';
     }
   };
 

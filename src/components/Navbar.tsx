@@ -3,10 +3,18 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
-  const scrollToCheckout = () => {
-    const checkout = document.getElementById('checkout');
-    if (checkout) {
-      checkout.scrollIntoView({ behavior: 'smooth' });
+  const safeScrollToElement = (elementId: string) => {
+    try {
+      console.log(`Attempting to scroll to element: #${elementId}`);
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        console.log(`Successfully scrolled to #${elementId}`);
+      } else {
+        console.warn(`Element not found: #${elementId}`);
+      }
+    } catch (error) {
+      console.error(`Error scrolling to #${elementId}:`, error);
     }
   };
 
@@ -21,35 +29,35 @@ const Navbar = () => {
             <Button 
               variant="ghost" 
               className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => safeScrollToElement('features')}
             >
               Features
             </Button>
             <Button 
               variant="ghost" 
               className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => document.getElementById('who-is-it-for')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => safeScrollToElement('who-is-it-for')}
             >
               Who It's For
             </Button>
             <Button 
               variant="ghost" 
               className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => document.getElementById('what-you-get')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => safeScrollToElement('what-you-get')}
             >
               What You Get
             </Button>
             <Button 
               variant="ghost" 
               className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => safeScrollToElement('faq')}
             >
               FAQ
             </Button>
           </nav>
           <Button 
             className="bg-accent text-dark font-bold hover:bg-opacity-90 transition-all"
-            onClick={scrollToCheckout}
+            onClick={() => safeScrollToElement('checkout')}
           >
             Get Started
           </Button>

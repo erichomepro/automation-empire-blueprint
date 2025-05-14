@@ -18,8 +18,15 @@ const FooterCTA = () => {
   }, []);
 
   const handleCheckout = () => {
-    console.log("Navigate to checkout");
-    navigate('/checkout');
+    try {
+      console.log("Navigate to checkout");
+      // Ensure we're using a properly formatted path
+      navigate('/checkout');
+    } catch (error) {
+      console.error("Navigation error:", error);
+      // Fallback for navigation errors
+      window.location.href = '/checkout';
+    }
   };
 
   return (

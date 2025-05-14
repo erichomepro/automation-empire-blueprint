@@ -10,6 +10,16 @@ import NotFound from "./pages/NotFound";
 import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 
+// Create a URL validator helper
+const sanitizePath = (path: string): string => {
+  // Make sure path starts with / and doesn't contain backslashes
+  let sanitized = path.replace(/\\/g, '/');
+  if (!sanitized.startsWith('/')) {
+    sanitized = '/' + sanitized;
+  }
+  return sanitized;
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -32,8 +42,29 @@ const App = () => {
     logViewportSize();
     window.addEventListener('resize', logViewportSize);
     
+    // Add a global error handler specifically for URL parsing errors
+    const originalFetch = window.fetch;
+    window.fetch = function(input, init) {
+      try {
+        return originalFetch(input, init);
+      } catch (error) {
+        console.error("Fetch error intercepted:", error);
+        if (error instanceof TypeError && error.message.includes("URL")) {
+          console.error("URL parsing error. Input was:", input);
+          // Try to recover by sanitizing the URL
+          if (typeof input === 'string') {
+            const sanitized = input.replace(/\\/g, '/');
+            console.log("Attempting recovery with sanitized URL:", sanitized);
+            return originalFetch(sanitized, init);
+          }
+        }
+        throw error;
+      }
+    };
+    
     return () => {
       window.removeEventListener('resize', logViewportSize);
+      window.fetch = originalFetch;
     };
   }, []);
 
@@ -42,7 +73,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename="">
           <Suspense fallback={
             <div className="h-screen w-full flex items-center justify-center bg-dark text-light">
               <p>Loading...</p>
