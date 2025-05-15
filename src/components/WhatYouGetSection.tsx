@@ -10,12 +10,12 @@ const WhatYouGetSection = () => {
   });
 
   const deliverables = [
-    "Lead Capture Airtable Templates",
-    "Client Onboarding Scenarios",
-    "Fulfillment Trackers",
-    "Testimonial Dashboard",
-    "SOPs + Reset Instructions",
-    "Step-by-Step Blueprint PDF"
+    "Full eBook (150+ pages) with step-by-step beginner instructions",
+    "Ready-to-use Make.com templates for every automation",
+    "Plug & Play Google Sheets + Forms setups",
+    "AI-powered email & content prompts (GPT-ready)",
+    "Access to the Automation Template Vault",
+    "Bonus videos + walkthroughs (sent by email)"
   ];
 
   return (
@@ -28,8 +28,7 @@ const WhatYouGetSection = () => {
       >
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-heading mb-4">
-            <span className="text-accent">No fluff. No theory.</span><br />
-            Just launch-ready assets
+            <span className="text-accent">What You Get</span>
           </h2>
           <p className="text-light/80 text-lg max-w-2xl mx-auto">
             Everything you need to build, package, and sell your automation system
@@ -51,8 +50,8 @@ const WhatYouGetSection = () => {
 
         <div className="mt-12 p-6 bg-muted border border-hero/20 rounded-xl text-center">
           <p className="text-xl">
-            You don't just learn automation —<br className="hidden md:block" /> 
-            <span className="font-bold text-accent">you get a product ready to sell by tomorrow.</span>
+            This isn't just an eBook — it's a new business operating system<br className="hidden md:block" /> 
+            <span className="font-bold text-accent">You don't just learn automation — you get a product ready to sell by tomorrow.</span>
           </p>
         </div>
       </div>

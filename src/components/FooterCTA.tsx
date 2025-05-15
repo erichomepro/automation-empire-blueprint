@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { safeNavigate, sanitizePath } from "@/lib/utils";
 
@@ -34,10 +34,10 @@ const FooterCTA = () => {
         }`}
       >
         <h2 className="text-xl md:text-3xl font-heading mb-4">
-          Still Reading? That's Your Sign.
+          Build it once. Sell it forever.
         </h2>
         <p className="text-lg md:text-xl mb-6 md:mb-8 text-light/90">
-          One automation away from your new life.
+          Start automating the business that sets you free.
         </p>
         
         <Button 
@@ -45,7 +45,8 @@ const FooterCTA = () => {
           size="lg" 
           className="btn-action w-full md:w-auto"
         >
-          Let's Build Your Empire <ArrowRight className="ml-2" size={18} />
+          <BookOpen className="mr-2" size={18} />
+          Grab the Book + Templates for $9.99 <ArrowRight className="ml-2" size={18} />
         </Button>
       </div>
     </section>

@@ -22,9 +22,9 @@ const Index = () => {
       <main className="w-full overflow-x-hidden">
         <HeroSection />
         <HighlightedTestimonial />
+        <BookContentSection />
         <FeaturesSection />
         <WhoForSection />
-        <BookContentSection />
         <WhatYouGetSection />
         <EmpowermentSection />
         <SocialProofSection />

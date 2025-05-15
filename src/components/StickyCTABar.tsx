@@ -31,7 +31,7 @@ const StickyCTABar = () => {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
         <div className="flex items-center mb-2 md:mb-0">
           <span className="text-orange-400 mr-2">🚀</span>
-          <span className="text-light font-medium">Get The Book for $9.99</span>
+          <span className="text-light font-medium">Limited-Time Launch Price: $9.99</span>
         </div>
         <Button 
           onClick={scrollToCheckout} 
@@ -39,7 +39,7 @@ const StickyCTABar = () => {
           className="btn-action text-sm md:text-base px-4 py-1"
         >
           <BookOpen className="mr-2" size={18} />
-          Buy Now →
+          Grab the Book + Templates →
         </Button>
       </div>
     </div>

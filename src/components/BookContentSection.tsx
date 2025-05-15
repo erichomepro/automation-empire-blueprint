@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useInView } from 'react-intersection-observer';
-import { FileText, CheckSquare, LayoutGrid, Settings, Users } from 'lucide-react';
+import { FileText, CheckSquare, LayoutGrid, Settings, Users, FileCheck, Award, Star } from 'lucide-react';
 
 const BookContentSection = () => {
   const { ref, inView } = useInView({
@@ -9,36 +8,48 @@ const BookContentSection = () => {
     triggerOnce: true,
   });
 
-  const chapters = [
+  const systems = [
     {
       icon: FileText,
-      title: "The Automated Empire Framework",
-      description: "Transform your business model into a scalable system",
+      title: "Lead Capture Engine",
+      description: "Collect and organize leads 24/7 with Google Forms + Sheets",
       color: "from-purple-500 to-purple-700"
     },
     {
-      icon: CheckSquare,
-      title: "Setup Your Make.com Backbone",
-      description: "The exact account settings that maximize efficiency",
+      icon: Users,
+      title: "Luxury Client Onboarding",
+      description: "Welcome new clients automatically with AI-generated emails",
       color: "from-orange-400 to-orange-600"
     },
     {
-      icon: LayoutGrid,
-      title: "Airtable Database Design",
-      description: "Structure your data for effortless scaling",
+      icon: Settings,
+      title: "Fulfillment Tracker",
+      description: "Assign tasks, track progress, and notify your team — hands-free",
       color: "from-blue-400 to-blue-600"
     },
     {
-      icon: Settings,
-      title: "Automation Scenarios",
-      description: "Copy-paste templates for instant integration",
+      icon: Star,
+      title: "Testimonial Collector",
+      description: "Ask, remind, and store social proof without lifting a finger",
       color: "from-green-400 to-green-600"
     },
     {
-      icon: Users,
-      title: "Client Onboarding Systems",
-      description: "Create seamless experiences without extra work",
+      icon: FileCheck,
+      title: "Proof-to-Sales Content Machine",
+      description: "Turn reviews into case studies, email copy, social content",
       color: "from-red-400 to-red-600"
+    },
+    {
+      icon: Award,
+      title: "Productization Blueprint",
+      description: "Sell your system as a DFY service or recurring offer",
+      color: "from-purple-400 to-purple-600"
+    },
+    {
+      icon: LayoutGrid,
+      title: "Full Business Automation Map",
+      description: "Scale into marketing, finance, admin, and internal ops",
+      color: "from-teal-400 to-teal-600"
     }
   ];
 
@@ -52,21 +63,21 @@ const BookContentSection = () => {
       >
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-heading mb-4">
-            <span className="text-orange-400">What's Inside</span> The Book
+            <span className="text-orange-400">What You'll Build</span> Inside This Book
           </h2>
           <p className="text-light/80 max-w-2xl mx-auto">
-            35+ pages of actionable content, templates and step-by-step guides to build your automated business
+            150+ pages of actionable content, templates and step-by-step guides to build your automated business
           </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {chapters.map((chapter, index) => (
+          {systems.map((system, index) => (
             <div 
               key={index} 
               className="bg-gradient-to-br from-purple-800/30 to-purple-950 p-6 rounded-xl border border-purple-400/20 shadow-lg transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className={`h-14 w-14 rounded-xl bg-gradient-to-br ${chapter.color} flex items-center justify-center mb-4 shadow-lg`}>
-                <chapter.icon size={24} className="text-white" />
+              <div className={`h-14 w-14 rounded-xl bg-gradient-to-br ${system.color} flex items-center justify-center mb-4 shadow-lg`}>
+                <system.icon size={24} className="text-white" />
               </div>
               
               <div className="flex items-center mb-4">
@@ -74,12 +85,12 @@ const BookContentSection = () => {
                   <span className="text-xs text-white font-bold">{index + 1}</span>
                 </div>
                 <h3 className="text-xl font-heading text-orange-400">
-                  {chapter.title}
+                  {system.title}
                 </h3>
               </div>
               
               <p className="text-light/70">
-                {chapter.description}
+                {system.description}
               </p>
               
               <div className="mt-4 relative overflow-hidden h-32 bg-purple-900/50 rounded border border-purple-400/20 flex items-center justify-center">
@@ -92,7 +103,7 @@ const BookContentSection = () => {
           ))}
         </div>
         
-        {/* New section to show book preview pages */}
+        {/* Book preview pages */}
         <div className="mt-16">
           <h3 className="text-2xl md:text-3xl font-heading mb-8 text-center">
             <span className="text-orange-400">Preview</span> Book Pages

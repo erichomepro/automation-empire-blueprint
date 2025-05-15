@@ -16,24 +16,24 @@ const FAQSection = () => {
   
   const faqs = [
     {
-      question: "Do I need tech experience?",
-      answer: "Nope. Everything's step-by-step and templated. If you can follow instructions, you can implement these systems. No coding or technical background required."
+      question: "What tools do I need?",
+      answer: "Google Sheets, Google Forms, Make.com (all free) — plus optional AI tools."
     },
     {
-      question: "Can I resell the systems?",
-      answer: "Yes — that's the whole point! The templates and systems are designed specifically so you can customize them for your clients and sell them as your own products."
+      question: "Is this for beginners?",
+      answer: "Yes. Every chapter is written for total first-timers — with screenshots, steps, and real examples."
     },
     {
-      question: "How fast can I make money?",
-      answer: "Some users close a client in under 2 weeks. The templates and systems are designed to be implemented quickly, allowing you to start selling them almost immediately."
+      question: "Can I sell what I build?",
+      answer: "Yes. You'll learn how to package your systems into a product or retainer offer — with examples and pricing strategies."
     },
     {
-      question: "Do I need to pay for other tools?",
-      answer: "You'll need free accounts with Make.com and Airtable to get started. The free tiers are sufficient for learning, and you can upgrade as your client base grows."
+      question: "Do I need to know how to code?",
+      answer: "Nope. Not one line. The book is specifically designed for non-technical entrepreneurs."
     },
     {
-      question: "How is this different from other automation courses?",
-      answer: "This isn't just training—it's a business in a box. You get ready-to-sell templates, SOPs, and systems that you can implement immediately, not just theoretical knowledge."
+      question: "Is this different from other automation courses?",
+      answer: "This isn't just training—it's a business in a box. You get ready-to-sell templates, SOPs, and systems that you can implement immediately."
     }
   ];
   

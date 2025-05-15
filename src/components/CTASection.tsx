@@ -1,24 +1,24 @@
+
 import React, { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
-import { Download, Clock, Mail, FileCheck } from 'lucide-react';
+import { Download, Clock, Mail, FileCheck, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
 const CTASection = () => {
-  const {
-    ref,
-    inView
-  } = useInView({
+  const { ref, inView } = useInView({
     threshold: 0.1,
     triggerOnce: true
   });
-  const {
-    toast
-  } = useToast();
+  
+  const { toast } = useToast();
+  
   const [timeLeft, setTimeLeft] = useState({
     hours: 23,
     minutes: 59,
     seconds: 59
   });
+  
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prevTime => {
@@ -43,16 +43,25 @@ const CTASection = () => {
         return prevTime;
       });
     }, 1000);
+    
     return () => clearInterval(timer);
   }, []);
+  
   const handlePurchase = () => {
     toast({
       title: "Purchase successful!",
       description: "Thank you for purchasing Automation Empire. Check your email for download instructions."
     });
   };
-  return <section id="checkout" className="section bg-gradient-to-b from-dark to-dark/95 border-t border-muted">
-      <div ref={ref} className={`max-w-4xl mx-auto transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+  
+  return (
+    <section id="checkout" className="section bg-gradient-to-b from-dark to-dark/95 border-t border-muted">
+      <div 
+        ref={ref}
+        className={`max-w-4xl mx-auto transition-all duration-700 ${
+          inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-5xl font-heading mb-6">
             <span className="text-accent">Build Once. Sell Forever.</span><br /> 
@@ -85,11 +94,19 @@ const CTASection = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <FileCheck className="text-accent" />
-                  <span className="font-semibold">First 50 buyers get a bonus checklist</span>
+                  <span className="font-semibold">Lifetime Updates</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <BookOpen className="text-accent" />
+                  <span className="font-semibold">Free 15 System Vault Access</span>
                 </div>
               </div>
               
-              <Button onClick={handlePurchase} size="lg" className="w-full py-6 text-xl btn-action">
+              <Button 
+                onClick={handlePurchase} 
+                size="lg" 
+                className="w-full py-6 text-xl btn-action"
+              >
                 Get My Copy Now
               </Button>
               
@@ -124,6 +141,8 @@ const CTASection = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default CTASection;

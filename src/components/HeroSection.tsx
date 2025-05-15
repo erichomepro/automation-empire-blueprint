@@ -57,19 +57,19 @@ const HeroSection = () => {
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
         }`}
       >
-        <h2 className="text-lg md:text-xl font-bold mb-2 text-orange-500">EBOOK DOWNLOAD • 35+ PAGES OF ACTIONABLE CONTENT</h2>
+        <h2 className="text-lg md:text-xl font-bold mb-2 text-orange-500">EBOOK DOWNLOAD • 150+ PAGES OF ACTIONABLE CONTENT</h2>
         
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-4 text-light">
-          {/* New headline test variant */}
-          <span className="text-purple-300 block">THE BLUEPRINTS BEHIND</span>
-          <span className="text-orange-500 block mt-2">$20K MONTHS</span>
-          <span className="text-sm md:text-lg text-light block mt-2">AUTOMATE YOUR BUSINESS WITHOUT CODE — NO TEAM, NO BURNOUT, JUST RESULTS</span>
+          {/* Updated headline based on new copy */}
+          <span className="text-purple-300 block">MAKE.COM IT ONCE.</span>
+          <span className="text-orange-600 block mt-2">SELL IT FOREVER.</span>
+          <span className="text-sm md:text-lg text-light block mt-2">AUTOMATE EVERYTHING. EARN EVERY DAY. BUILD YOUR BUSINESS LIKE SOFTWARE.</span>
         </h1>
 
         <div className="my-6 md:my-8 h-12 overflow-hidden">
-          <h2 className="typewriter text-xl md:text-2xl font-heading">
-            BUILD ONCE. SELL IT FOREVER.
-          </h2>
+          <p className="text-xl md:text-2xl font-heading">
+            Turn your daily grind into a fully automated, income-generating machine — without hiring a team or writing code.
+          </p>
         </div>
 
         <div className="flex flex-col md:flex-row justify-center items-center gap-8 my-8">
@@ -77,8 +77,8 @@ const HeroSection = () => {
           
           <div className="flex-1">
             <p className="text-base md:text-xl mb-8 max-w-3xl mx-auto text-light/90 px-2">
-              Discover the blueprints that built $20K+ months using Make.com + Airtable —
-              <span className="font-bold block sm:inline sm:ml-2">no code, no team, no burnout. Just results.</span>
+              Based on the systems that helped generate $20K+ months at Cerberus Media —
+              <span className="font-bold block sm:inline sm:ml-2">now packaged and ready for you.</span>
             </p>
             
             <div className="mt-6 md:mt-8">
@@ -93,7 +93,7 @@ const HeroSection = () => {
               
               {/* Added benefit bullet under CTA button */}
               <p className="text-light/80 mt-3 text-sm md:text-base">
-                🔁 Build once, automate forever. No code needed.
+                🔁 Full guide + templates + AI integrations
               </p>
             </div>
             
