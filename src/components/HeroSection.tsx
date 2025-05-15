@@ -57,12 +57,12 @@ const HeroSection = () => {
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
         }`}
       >
-        <h2 className="text-lg md:text-xl font-bold mb-2 text-orange-400">EBOOK DOWNLOAD • 35+ PAGES OF ACTIONABLE CONTENT</h2>
+        <h2 className="text-lg md:text-xl font-bold mb-2 text-orange-500">EBOOK DOWNLOAD • 35+ PAGES OF ACTIONABLE CONTENT</h2>
         
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-4 text-light">
           {/* New headline test variant */}
-          <span className="text-purple-300 block">THE BLUEPRINT BEHIND</span>
-          <span className="text-orange-400 block mt-2">$20K MONTHS</span>
+          <span className="text-purple-300 block">THE BLUEPRINTS BEHIND</span>
+          <span className="text-orange-500 block mt-2">$20K MONTHS</span>
           <span className="text-sm md:text-lg text-light block mt-2">AUTOMATE YOUR BUSINESS WITHOUT CODE — NO TEAM, NO BURNOUT, JUST RESULTS</span>
         </h1>
 
@@ -77,7 +77,7 @@ const HeroSection = () => {
           
           <div className="flex-1">
             <p className="text-base md:text-xl mb-8 max-w-3xl mx-auto text-light/90 px-2">
-              Discover the blueprint that built $20K+ months using Make.com + Airtable —
+              Discover the blueprints that built $20K+ months using Make.com + Airtable —
               <span className="font-bold block sm:inline sm:ml-2">no code, no team, no burnout. Just results.</span>
             </p>
             
@@ -88,7 +88,7 @@ const HeroSection = () => {
                 className="btn-action text-base md:text-lg px-4 py-2 md:px-8 md:py-4 w-full max-w-xs md:max-w-none md:w-auto"
               >
                 <BookOpen className="mr-2" size={20} />
-                Get the Automation Blueprint — $9.99
+                Get the Automation Blueprints — $9.99
               </Button>
               
               {/* Added benefit bullet under CTA button */}
