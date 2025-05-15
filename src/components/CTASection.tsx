@@ -1,55 +1,58 @@
-
 import React, { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
 import { Download, Clock, Mail, FileCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
 const CTASection = () => {
-  const { ref, inView } = useInView({
+  const {
+    ref,
+    inView
+  } = useInView({
     threshold: 0.1,
-    triggerOnce: true,
+    triggerOnce: true
   });
-
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [timeLeft, setTimeLeft] = useState({
     hours: 23,
     minutes: 59,
     seconds: 59
   });
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prevTime => {
         if (prevTime.seconds > 0) {
-          return { ...prevTime, seconds: prevTime.seconds - 1 };
+          return {
+            ...prevTime,
+            seconds: prevTime.seconds - 1
+          };
         } else if (prevTime.minutes > 0) {
-          return { ...prevTime, minutes: prevTime.minutes - 1, seconds: 59 };
+          return {
+            ...prevTime,
+            minutes: prevTime.minutes - 1,
+            seconds: 59
+          };
         } else if (prevTime.hours > 0) {
-          return { hours: prevTime.hours - 1, minutes: 59, seconds: 59 };
+          return {
+            hours: prevTime.hours - 1,
+            minutes: 59,
+            seconds: 59
+          };
         }
         return prevTime;
       });
     }, 1000);
-    
     return () => clearInterval(timer);
   }, []);
-
   const handlePurchase = () => {
     toast({
       title: "Purchase successful!",
-      description: "Thank you for purchasing Automation Empire. Check your email for download instructions.",
+      description: "Thank you for purchasing Automation Empire. Check your email for download instructions."
     });
   };
-
-  return (
-    <section id="checkout" className="section bg-gradient-to-b from-dark to-dark/95 border-t border-muted">
-      <div 
-        ref={ref}
-        className={`max-w-4xl mx-auto transition-all duration-700 ${
-          inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}
-      >
+  return <section id="checkout" className="section bg-gradient-to-b from-dark to-dark/95 border-t border-muted">
+      <div ref={ref} className={`max-w-4xl mx-auto transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-5xl font-heading mb-6">
             <span className="text-accent">Build Once. Sell Forever.</span><br /> 
@@ -86,17 +89,11 @@ const CTASection = () => {
                 </div>
               </div>
               
-              <Button 
-                onClick={handlePurchase}
-                size="lg" 
-                className="w-full py-6 text-xl btn-action"
-              >
+              <Button onClick={handlePurchase} size="lg" className="w-full py-6 text-xl btn-action">
                 Get My Copy Now
               </Button>
               
-              <p className="text-center text-light/60 text-sm mt-4">
-                Secure payment via Stripe • 30-day money-back guarantee
-              </p>
+              <p className="text-center text-light/60 text-sm mt-4">Secure payment • 30-day money-back guarantee</p>
             </div>
             
             <div className="w-full md:w-1/3 bg-dark p-6 rounded-lg border border-hero/20">
@@ -127,8 +124,6 @@ const CTASection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default CTASection;
