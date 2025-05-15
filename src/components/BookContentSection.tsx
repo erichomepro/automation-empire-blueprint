@@ -91,6 +91,51 @@ const BookContentSection = () => {
             </div>
           ))}
         </div>
+        
+        {/* New section to show book preview pages */}
+        <div className="mt-16">
+          <h3 className="text-2xl md:text-3xl font-heading mb-8 text-center">
+            <span className="text-orange-400">Preview</span> Book Pages
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Book Page 1 */}
+            <div className="rounded-lg overflow-hidden border-2 border-purple-500/30 shadow-xl bg-gradient-to-br from-purple-800/50 to-purple-950/90">
+              <img 
+                src="/lovable-uploads/de4acb7d-a832-4753-9f70-d4e49ad7d5ce.png"
+                alt="Real Scenarios page - Automation examples for different business types"
+                className="w-full h-auto hover:scale-102 transition-transform"
+              />
+              <div className="p-4 bg-purple-900/50">
+                <h4 className="text-xl font-heading text-orange-400">Real Scenarios For Your Business</h4>
+                <p className="text-light/70 text-sm mt-1">
+                  See exactly how these automations work for marketing, coaching, and SaaS businesses
+                </p>
+              </div>
+            </div>
+            
+            {/* Book Page 2 */}
+            <div className="rounded-lg overflow-hidden border-2 border-purple-500/30 shadow-xl bg-gradient-to-br from-purple-800/50 to-purple-950/90">
+              <img 
+                src="/lovable-uploads/a089f995-50b4-4e9c-884e-e4ab8b120b0b.png"
+                alt="Technical setup page - Make.com automation flow example"
+                className="w-full h-auto hover:scale-102 transition-transform"
+              />
+              <div className="p-4 bg-purple-900/50">
+                <h4 className="text-xl font-heading text-orange-400">Complete Technical Setup</h4>
+                <p className="text-light/70 text-sm mt-1">
+                  Step-by-step guides to avoid common pitfalls and set up bulletproof systems
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-8 text-center">
+            <p className="text-light/90 inline-block bg-purple-800/30 px-4 py-2 rounded-md border border-purple-400/20">
+              <span className="font-bold text-orange-400">And much more</span> — including templates, troubleshooting guides, and advanced tactics!
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

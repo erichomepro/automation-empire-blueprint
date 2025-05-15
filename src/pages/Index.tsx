@@ -25,8 +25,8 @@ const Index = () => {
         <FeaturesSection />
         <WhoForSection />
         <BookContentSection />
-        <EmpowermentSection />
         <WhatYouGetSection />
+        <EmpowermentSection />
         <SocialProofSection />
         <FAQSection />
         <CTASection />
