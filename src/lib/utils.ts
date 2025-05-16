@@ -1,16 +1,9 @@
-
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
 import { NavigateFunction } from "react-router-dom";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-
 /**
- * Sanitizes a URL path, ensuring it's properly formatted for all devices
+ * Sanitizes a URL path to prevent parsing errors, especially on mobile devices
  */
-export function sanitizePath(path: string): string {
+export const sanitizePath = (path: string): string => {
   if (!path) return "/";
   let sanitized = path.trim().replace(/\\/g, '/');
   sanitized = sanitized.replace(/([^:])\/\/+/g, '$1/');
@@ -22,71 +15,56 @@ export function sanitizePath(path: string): string {
   }
   
   return encodeURI(sanitized);
-}
+};
 
 /**
- * Safely scrolls to an element by ID with fallback navigation
+ * Centralized navigation utility that handles scrolling to elements or 
+ * navigating to fallback paths with proper error handling
  */
-export function safeScrollToElement(
+export const navigateToSection = (
   id: string,
   navigate: NavigateFunction,
   fallbackPath?: string
-) {
-  const target = document.getElementById(id);
-
-  if (target) {
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-  } else if (fallbackPath) {
-    const cleanPath = sanitizePath(fallbackPath);
-    console.log(`[safeScrollToElement] Navigating to fallback: ${cleanPath}`);
+) => {
+  try {
+    const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+    const target = document.getElementById(id);
     
-    // Add mobile-specific logging for debugging
-    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-      console.log("[MOBILE NAVIGATION] Clean path to:", cleanPath);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      console.log(`[navigateToSection] Scrolled to element: ${id}`);
+    } else if (fallbackPath) {
+      const cleanPath = sanitizePath(fallbackPath);
+      console.log(`[navigateToSection] Navigating to fallback path: ${cleanPath}`);
+      
+      // Additional logging for mobile devices
+      if (isMobile) {
+        console.log("[MOBILE NAVIGATION] Clean path to:", cleanPath);
+      }
+      
+      navigate(cleanPath);
+    } else {
+      console.error(`[navigateToSection] Element '${id}' not found and no fallback provided.`);
     }
-    
-    navigate(cleanPath);
-  } else {
-    console.warn(`[safeScrollToElement] Element '${id}' not found and no fallback provided.`);
+  } catch (error) {
+    console.error("[navigateToSection] Navigation error:", error);
   }
-}
+};
 
 /**
- * Safely navigate to a path using React Router
+ * Enhanced navigation function with built-in error handling
  */
-export function safeNavigate(navigate: NavigateFunction, path: string): void {
+export const safeNavigate = (navigate: NavigateFunction, path: string) => {
   try {
-    // Always sanitize the path first
-    const safePath = sanitizePath(path);
-    console.log(`Navigating to: ${safePath}`);
-    
-    // Check if this is a mobile device for extra caution
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      // Additional logging for mobile devices
-      console.log("[MOBILE NAVIGATION] Clean path to:", safePath);
-      
-      // Additional validation for mobile devices
-      if (safePath.includes('\\')) {
-        console.error(`Mobile navigation error: Path contains backslashes: ${safePath}`);
-        navigate('/'); // Safely navigate to home as fallback
-        return;
-      }
-    }
-    
-    // Use React Router for navigation
-    navigate(safePath);
+    console.log(`[safeNavigate] Navigating to: ${path}`);
+    navigate(path);
   } catch (error) {
-    console.error("Navigation error:", error);
-    
-    // Fallback to location.href for critical errors but ensure path is safe
+    console.error("[safeNavigate] Navigation failed:", error);
+    // Fallback to direct location change if navigate fails
     try {
-      let fallbackPath = '/'; // Default to home
-      window.location.href = fallbackPath;
-    } catch (e) {
-      console.error("Critical navigation error, redirecting to home:", e);
-      window.location.href = '/';
+      window.location.href = path;
+    } catch (innerError) {
+      console.error("[safeNavigate] Even direct location change failed:", innerError);
     }
   }
-}
+};

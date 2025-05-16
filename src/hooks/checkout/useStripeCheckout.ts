@@ -1,8 +1,6 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
-import { CheckoutFormValues } from "@/types/checkout";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -11,19 +9,18 @@ import { supabase } from "@/integrations/supabase/client";
 export const useStripeCheckout = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  const processPayment = async (values: CheckoutFormValues) => {
+  const processPayment = async (customerName: string = "", customerEmail: string = "") => {
     setLoading(true);
     
     try {
-      console.log("Processing checkout for:", values.fullName, values.email);
+      console.log("Processing direct checkout for:", customerName || "Guest", customerEmail || "No email");
       
       // Create Stripe checkout session using our edge function
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: {
-          customerName: values.fullName,
-          customerEmail: values.email
+          customerName: customerName || "Guest",
+          customerEmail: customerEmail || ""
         }
       });
 
@@ -36,9 +33,9 @@ export const useStripeCheckout = () => {
         throw new Error("No checkout URL returned from Stripe");
       }
 
-      console.log("Checkout session created:", data);
+      console.log("Checkout session created successfully:", data);
       
-      // Redirect to Stripe checkout
+      // Redirect directly to Stripe checkout
       window.location.href = data.checkoutUrl;
       
     } catch (error: any) {

@@ -3,11 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { safeNavigate, sanitizePath } from "@/lib/utils";
+import { useStripeCheckout } from "@/hooks/checkout/useStripeCheckout";
 
 const StickyCTABar = () => {
   const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
+  const { processPayment, loading } = useStripeCheckout();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,10 +21,9 @@ const StickyCTABar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToCheckout = () => {
-    const sanitizedPath = sanitizePath('/checkout');
-    console.log("Sticky CTA: Navigate to checkout path:", sanitizedPath);
-    safeNavigate(navigate, sanitizedPath);
+  const handlePurchase = () => {
+    console.log("Sticky CTA: Starting direct checkout");
+    processPayment();
   };
 
   return (
@@ -36,12 +36,13 @@ const StickyCTABar = () => {
           <span className="text-light font-medium">Limited-Time Launch Price: $9.99</span>
         </div>
         <Button 
-          onClick={scrollToCheckout} 
+          onClick={handlePurchase} 
           size="sm" 
           className="btn-action text-sm md:text-base px-4 py-1"
+          disabled={loading}
         >
           <BookOpen className="mr-2" size={18} />
-          Grab the Book + Templates →
+          {loading ? "Processing..." : "Grab the Book + Templates →"}
         </Button>
       </div>
     </div>

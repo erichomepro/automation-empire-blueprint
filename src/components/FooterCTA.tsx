@@ -2,9 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { safeNavigate, sanitizePath } from "@/lib/utils";
+import { ArrowRight, BookOpen, Loader2 } from 'lucide-react';
+import { useStripeCheckout } from "@/hooks/checkout/useStripeCheckout";
 
 const FooterCTA = () => {
   const { ref, inView } = useInView({
@@ -12,15 +11,13 @@ const FooterCTA = () => {
     triggerOnce: true,
   });
   
-  const navigate = useNavigate();
+  const { processPayment, loading } = useStripeCheckout();
   // Fixed price for the product
   const price = "9.99";
 
-  const handleCheckout = () => {
-    // Always use sanitized paths and our enhanced navigation utility
-    const sanitizedPath = sanitizePath('/checkout');
-    console.log("Footer CTA: Navigate to sanitized checkout path:", sanitizedPath);
-    safeNavigate(navigate, sanitizedPath);
+  const handlePurchase = () => {
+    console.log("Footer CTA: Starting direct checkout");
+    processPayment();
   };
 
   return (
@@ -39,12 +36,22 @@ const FooterCTA = () => {
         </p>
         
         <Button 
-          onClick={handleCheckout}
+          onClick={handlePurchase}
           size="lg" 
           className="btn-action w-full md:w-auto"
+          disabled={loading}
         >
-          <BookOpen className="mr-2" size={18} />
-          Grab the Book + Templates for ${price} <ArrowRight className="ml-2" size={18} />
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 animate-spin" size={18} />
+              Processing...
+            </>
+          ) : (
+            <>
+              <BookOpen className="mr-2" size={18} />
+              Grab the Book + Templates for ${price} <ArrowRight className="ml-2" size={18} />
+            </>
+          )}
         </Button>
       </div>
     </section>
