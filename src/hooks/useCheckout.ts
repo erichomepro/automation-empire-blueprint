@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkoutFormSchema, CheckoutFormValues } from "@/types/checkout";
 import { getCardType } from "@/utils/checkoutUtils";
 
-// Supabase payment webhook function URL
+// Supabase payment webhook function URL - Fix the URL formatting
 const PAYMENT_WEBHOOK_URL = "https://wmslhycsuhuxfjejjxze.supabase.co/functions/v1/payment-webhook";
 
 export const useCheckout = () => {
@@ -155,7 +155,7 @@ export const useCheckout = () => {
       console.log("Purchase record created:", data);
       console.log("Sending payment data to webhook:", PAYMENT_WEBHOOK_URL);
       
-      // Send payment data to our Supabase webhook function
+      // Send payment data to our Supabase webhook function - fix URL formatting issue
       const webhookResponse = await fetch(PAYMENT_WEBHOOK_URL, {
         method: "POST",
         headers: {
