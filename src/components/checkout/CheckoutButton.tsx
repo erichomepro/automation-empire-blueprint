@@ -20,7 +20,7 @@ const CheckoutButton = ({ loading }: CheckoutButtonProps) => {
         </span>
       ) : (
         <span className="flex items-center">
-          Complete Purchase <ArrowRight className="ml-2" size={18} />
+          Proceed to Secure Checkout <ArrowRight className="ml-2" size={18} />
         </span>
       )}
     </Button>

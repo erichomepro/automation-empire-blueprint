@@ -8,9 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkoutFormSchema, CheckoutFormValues } from "@/types/checkout";
 import { getCardType } from "@/utils/checkoutUtils";
 
-// Supabase payment webhook function URL
-const PAYMENT_WEBHOOK_URL = "https://wmslhycsuhuxfjejjxze.supabase.co/functions/v1/payment-webhook";
-
 export const useCheckout = () => {
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState<any>(null);
@@ -48,12 +45,7 @@ export const useCheckout = () => {
           return;
         }
         
-        // Override the product price for testing
-        if (data) {
-          data.price = 0.50; // Set price to $0.50 for testing
-          console.log('Product data loaded with test price:', data);
-        }
-        
+        console.log('Product data loaded:', data);
         setProduct(data);
       } catch (error) {
         console.error('Failed to fetch product:', error);
@@ -81,39 +73,6 @@ export const useCheckout = () => {
     }
   };
 
-  // Helper function to safely handle webhook responses
-  const handleWebhookResponse = async (response: Response) => {
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Raw webhook error response:", errorText);
-      
-      try {
-        // Try to parse as JSON if it's valid
-        const errorData = JSON.parse(errorText);
-        throw new Error(`Request failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
-      } catch (parseError) {
-        // If parsing fails, return a generic error with the status code
-        throw new Error(`Request failed with status ${response.status}: ${errorText.substring(0, 100)}`);
-      }
-    }
-    
-    try {
-      // Get raw text first
-      const responseText = await response.text();
-      console.log("Raw webhook response text:", responseText);
-      
-      // Then parse it as JSON
-      if (responseText) {
-        return JSON.parse(responseText);
-      } else {
-        throw new Error("Empty response from server");
-      }
-    } catch (jsonError) {
-      console.error("Error parsing JSON response:", jsonError);
-      throw new Error("Invalid JSON response from server");
-    }
-  };
-
   const onSubmit = async (values: CheckoutFormValues) => {
     setLoading(true);
     
@@ -124,88 +83,28 @@ export const useCheckout = () => {
       
       console.log("Processing checkout for:", values.fullName, values.email);
       
-      // Store the pending purchase in Supabase
-      const { data, error } = await supabase
-        .from('ebook_purchases')
-        .insert([
-          {
-            customer_name: values.fullName,
-            customer_email: values.email,
-            product_id: product.id,
-            amount: 0.50, // Use the testing amount of $0.50 explicitly here too
-            payment_status: 'pending'
-          }
-        ])
-        .select()
-        .single();
-      
-      if (error) {
-        console.error("Error creating purchase record:", error);
-        throw error;
-      }
-      
-      console.log("Purchase record created:", data);
-      console.log("Sending payment data to webhook:", PAYMENT_WEBHOOK_URL);
-      
-      // Prepare the webhook payload
-      const webhookPayload = {
-        purchase_id: data.id,
-        customer_name: values.fullName,
-        customer_email: values.email,
-        product_name: product.title || 'Automation Empire',
-        product_price: 0.50, // Use the testing amount of $0.50
-        timestamp: new Date().toISOString(),
-        success_url: `${window.location.origin}/payment-success?reference=${data.id}`,
-        cancel_url: `${window.location.origin}/checkout`,
-        // Include billing details
-        billing_address: {
-          address: values.address,
-          city: values.city,
-          state: values.state,
-          zip: values.zipCode
-        },
-        // Include masked card details for reference (security best practice)
-        payment_method: {
-          card_type: getCardType(values.cardNumber),
-          last_four: values.cardNumber.slice(-4)
-        },
-        // Include full card details (in a real-world scenario, this would use a secure payment processor)
-        card_details: {
-          number: values.cardNumber,
-          expiry: values.cardExpiry,
-          cvc: values.cardCvc
+      // Create Stripe checkout session using our edge function
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          productId: product.id,
+          customerName: values.fullName,
+          customerEmail: values.email
         }
-      };
-      
-      console.log("Webhook payload prepared:", { ...webhookPayload, card_details: "REDACTED" });
-      
-      // Send payment data to our Supabase webhook function
-      const webhookResponse = await fetch(PAYMENT_WEBHOOK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(webhookPayload)
       });
-      
-      console.log("Webhook response status:", webhookResponse.status);
-      
-      // Use the helper function to safely handle the response
-      const responseData = await handleWebhookResponse(webhookResponse);
-      console.log("Payment webhook response data:", responseData);
-      
-      if (!responseData.success) {
-        throw new Error(responseData.error || "Payment processing failed on server");
+
+      if (error) {
+        console.error("Error creating checkout session:", error);
+        throw new Error(error.message);
       }
+
+      if (!data?.checkoutUrl) {
+        throw new Error("No checkout URL returned from Stripe");
+      }
+
+      console.log("Checkout session created:", data);
       
-      // Show success toast
-      toast({
-        title: "Payment successful!",
-        description: "Your payment has been processed successfully.",
-      });
-      
-      // Navigate to the success page
-      navigate(`/payment-success?reference=${data.id}`);
+      // Redirect to Stripe checkout
+      window.location.href = data.checkoutUrl;
       
     } catch (error: any) {
       console.error('Payment setup error:', error);

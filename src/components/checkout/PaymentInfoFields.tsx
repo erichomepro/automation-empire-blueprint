@@ -3,7 +3,7 @@ import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
-import { CreditCard } from 'lucide-react';
+import { CreditCard, LockIcon } from 'lucide-react';
 import { CheckoutFormValues } from "@/types/checkout";
 
 interface PaymentInfoFieldsProps {
@@ -16,6 +16,10 @@ const PaymentInfoFields = ({ form, formatCardNumber, formatCardExpiry }: Payment
   return (
     <div className="pt-2 border-t border-slate-800">
       <h3 className="text-md font-medium mb-4">Payment Information</h3>
+      <div className="bg-slate-800 p-4 rounded-md mb-4 flex items-center">
+        <LockIcon className="text-green-500 mr-2" size={16} />
+        <p className="text-sm text-slate-300">Your payment will be securely processed by Stripe. Your card details will never be stored on our servers.</p>
+      </div>
       <div className="space-y-4">
         <FormField
           control={form.control}
