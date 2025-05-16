@@ -11,14 +11,23 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+
+// Create a Supabase client with the service role key for admin operations
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Optional: Forward data to Make.com webhook if configured
 const makeWebhookUrl = Deno.env.get("MAKE_WEBHOOK_URL") || "";
 
+// Helper function for logging
+const logStep = (step: string, details?: any) => {
+  console.log(`[PAYMENT-WEBHOOK] ${step}${details ? ': ' + JSON.stringify(details) : ''}`);
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    logStep("Handling OPTIONS request");
     return new Response(null, {
       headers: corsHeaders,
       status: 204,
@@ -27,6 +36,7 @@ serve(async (req) => {
 
   // Only allow POST requests
   if (req.method !== "POST") {
+    logStep("Method not allowed", { method: req.method });
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 405,
@@ -34,9 +44,11 @@ serve(async (req) => {
   }
 
   try {
+    logStep("Request received");
+    
     // Parse request body
     const requestData = await req.json();
-    console.log("Received webhook payload:", requestData);
+    logStep("Received webhook payload", requestData);
 
     // Store webhook event directly in the payment_webhook_events table
     const { data: eventData, error: eventError } = await supabase
@@ -45,14 +57,16 @@ serve(async (req) => {
       .select();
 
     if (eventError) {
-      console.error("Error storing webhook event:", eventError);
-      throw eventError;
+      logStep("Error storing webhook event", eventError);
+      throw new Error(`Failed to store webhook event: ${eventError.message}`);
     }
 
-    console.log("Successfully stored webhook event:", eventData);
+    logStep("Successfully stored webhook event", { eventId: eventData?.[0]?.id });
 
     // If there's a purchase_id in the requestData, update the purchase record
     if (requestData.purchase_id) {
+      logStep("Updating purchase record", { purchaseId: requestData.purchase_id });
+      
       const { error: purchaseError } = await supabase
         .from("ebook_purchases")
         .update({
@@ -62,34 +76,36 @@ serve(async (req) => {
         .eq('id', requestData.purchase_id);
 
       if (purchaseError) {
+        logStep("Error updating purchase record", purchaseError);
+        // Don't throw here - we already stored the event data
         console.error("Error updating purchase record:", purchaseError);
-        // Continue processing even if this update fails
       } else {
-        console.log("Successfully updated purchase record:", requestData.purchase_id);
+        logStep("Successfully updated purchase record", { purchaseId: requestData.purchase_id });
       }
     }
 
     // If Make.com webhook URL is configured, also forward the data there
     if (makeWebhookUrl) {
       try {
-        console.log("Forwarding to Make.com webhook:", makeWebhookUrl);
+        logStep("Forwarding to Make.com webhook", { url: makeWebhookUrl });
         const makeResponse = await fetch(makeWebhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...requestData,
-            supabase_event_id: eventData[0].id
+            supabase_event_id: eventData?.[0]?.id
           })
         });
         
-        console.log("Make.com response status:", makeResponse.status);
+        logStep("Make.com response status", { status: makeResponse.status });
       } catch (makeError) {
-        console.error("Error forwarding to Make.com:", makeError);
-        // Don't throw error here, as we've already stored the event in our database
+        logStep("Error forwarding to Make.com", makeError);
+        // Don't throw here - we already stored the event in our database
       }
     }
 
     // Return success response
+    logStep("Returning success response");
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -102,7 +118,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("Error processing webhook:", error);
+    logStep("Error processing webhook", { message: error.message });
     
     return new Response(
       JSON.stringify({ 

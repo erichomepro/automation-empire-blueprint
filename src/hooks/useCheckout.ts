@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +52,7 @@ export const useCheckout = () => {
         // Override the product price for testing
         if (data) {
           data.price = 0.50; // Set price to $0.50 for testing
+          console.log('Product data loaded with test price:', data);
         }
         
         setProduct(data);
@@ -80,6 +82,39 @@ export const useCheckout = () => {
     }
   };
 
+  // Helper function to safely handle webhook responses
+  const handleWebhookResponse = async (response: Response) => {
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Raw webhook error response:", errorText);
+      
+      try {
+        // Try to parse as JSON if it's valid
+        const errorData = JSON.parse(errorText);
+        throw new Error(`Request failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      } catch (parseError) {
+        // If parsing fails, return a generic error with the status code
+        throw new Error(`Request failed with status ${response.status}: ${errorText.substring(0, 100)}`);
+      }
+    }
+    
+    try {
+      // Get raw text first
+      const responseText = await response.text();
+      console.log("Raw webhook response text:", responseText);
+      
+      // Then parse it as JSON
+      if (responseText) {
+        return JSON.parse(responseText);
+      } else {
+        throw new Error("Empty response from server");
+      }
+    } catch (jsonError) {
+      console.error("Error parsing JSON response:", jsonError);
+      throw new Error("Invalid JSON response from server");
+    }
+  };
+
   // Test webhook connection
   const testWebhook = async (): Promise<void> => {
     setWebhookStatus('sending');
@@ -102,17 +137,8 @@ export const useCheckout = () => {
       
       console.log("Test webhook response status:", webhookResponse.status);
       
-      if (!webhookResponse.ok) {
-        setWebhookStatus('error');
-        const errorData = await webhookResponse.json().catch(() => ({ error: `Status code: ${webhookResponse.status}` }));
-        throw new Error(`Webhook test failed: ${webhookResponse.status} - ${errorData.error || 'Unknown error'}`);
-      }
-      
-      const responseData = await webhookResponse.json().catch(error => {
-        console.error("Error parsing webhook response JSON:", error);
-        throw new Error("Invalid JSON response from webhook");
-      });
-      
+      // Use the helper function to safely handle the response
+      const responseData = await handleWebhookResponse(webhookResponse);
       console.log("Webhook test response data:", responseData);
       
       setWebhookStatus('success');
@@ -166,69 +192,51 @@ export const useCheckout = () => {
       console.log("Purchase record created:", data);
       console.log("Sending payment data to webhook:", PAYMENT_WEBHOOK_URL);
       
+      // Prepare the webhook payload
+      const webhookPayload = {
+        purchase_id: data.id,
+        customer_name: values.fullName,
+        customer_email: values.email,
+        product_name: product.title || 'Automation Empire',
+        product_price: 0.50, // Use the testing amount of $0.50
+        timestamp: new Date().toISOString(),
+        success_url: `${window.location.origin}/payment-success?reference=${data.id}`,
+        cancel_url: `${window.location.origin}/checkout`,
+        // Include billing details
+        billing_address: {
+          address: values.address,
+          city: values.city,
+          state: values.state,
+          zip: values.zipCode
+        },
+        // Include masked card details for reference (security best practice)
+        payment_method: {
+          card_type: getCardType(values.cardNumber),
+          last_four: values.cardNumber.slice(-4)
+        },
+        // Include full card details (in a real-world scenario, this would use a secure payment processor)
+        card_details: {
+          number: values.cardNumber,
+          expiry: values.cardExpiry,
+          cvc: values.cardCvc
+        }
+      };
+      
+      console.log("Webhook payload prepared:", { ...webhookPayload, card_details: "REDACTED" });
+      
       // Send payment data to our Supabase webhook function
       const webhookResponse = await fetch(PAYMENT_WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          purchase_id: data.id,
-          customer_name: values.fullName,
-          customer_email: values.email,
-          product_name: product.title || 'Automation Empire',
-          product_price: 0.50, // Use the testing amount of $0.50
-          timestamp: new Date().toISOString(),
-          success_url: `${window.location.origin}/payment-success?reference=${data.id}`,
-          cancel_url: `${window.location.origin}/checkout`,
-          // Include billing details
-          billing_address: {
-            address: values.address,
-            city: values.city,
-            state: values.state,
-            zip: values.zipCode
-          },
-          // Include masked card details for reference (security best practice)
-          payment_method: {
-            card_type: getCardType(values.cardNumber),
-            last_four: values.cardNumber.slice(-4)
-          },
-          // Include full card details (in a real-world scenario, this would use a secure payment processor)
-          card_details: {
-            number: values.cardNumber,
-            expiry: values.cardExpiry,
-            cvc: values.cardCvc
-          }
-        })
+        body: JSON.stringify(webhookPayload)
       });
       
       console.log("Webhook response status:", webhookResponse.status);
       
-      if (!webhookResponse.ok) {
-        setWebhookStatus('error');
-        const errorText = await webhookResponse.text();
-        console.error("Raw webhook response:", errorText);
-        try {
-          // Try to parse as JSON if it's a valid JSON response
-          const errorData = JSON.parse(errorText);
-          throw new Error(`Payment processing failed: ${webhookResponse.status} - ${errorData.error || 'Unknown error'}`);
-        } catch (parseError) {
-          // If it's not a valid JSON, show the raw text or status code
-          throw new Error(`Payment processing failed: ${webhookResponse.status} - Non-JSON response received`);
-        }
-      }
-      
-      // Try to parse response as JSON safely
-      let responseData;
-      try {
-        const responseText = await webhookResponse.text();
-        console.log("Raw webhook response text:", responseText);
-        responseData = JSON.parse(responseText);
-      } catch (jsonError) {
-        console.error("Failed to parse webhook response as JSON:", jsonError);
-        throw new Error("Invalid response from payment server");
-      }
-      
+      // Use the helper function to safely handle the response
+      const responseData = await handleWebhookResponse(webhookResponse);
       console.log("Payment webhook response data:", responseData);
       
       if (!responseData.success) {
