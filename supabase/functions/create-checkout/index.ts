@@ -66,8 +66,8 @@ serve(async (req) => {
     
     logStep("Purchase record created", { purchaseId: purchaseData.id });
 
-    // Use the new product ID provided by the user
-    const productId = "prod_SK2qtyqhPwRMtX";
+    // Use the original product ID
+    const productId = "prod_SJrKv0Vxdw6nhP";
     logStep("Using specific Stripe product ID", { productId });
 
     // Create Stripe checkout session
@@ -77,7 +77,7 @@ serve(async (req) => {
         {
           price_data: {
             currency: "usd",
-            product: productId, // Use the updated product ID
+            product: productId, // Use the original product ID
             unit_amount: 999, // $9.99 in cents
           },
           quantity: 1,
