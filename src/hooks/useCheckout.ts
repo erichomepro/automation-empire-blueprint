@@ -8,8 +8,8 @@ import { checkoutFormSchema, CheckoutFormValues } from "@/types/checkout";
 import { getCardType } from "@/utils/checkoutUtils";
 
 // Make.com webhook URL for QuickBooks payment processing
-// Updated webhook URL - previous one was returning 404
-const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/12345abcdef"; // You need to replace this with your correct webhook URL
+// Corrected webhook URL
+const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/1am5x4gdobw2zbya7t77lpew8c4hno1k"; // You need to replace this with your correct webhook URL
 
 export const useCheckout = () => {
   const [loading, setLoading] = useState(false);
@@ -103,9 +103,18 @@ export const useCheckout = () => {
       }
       
       setWebhookStatus('success');
+      toast({
+        title: "Webhook test successful",
+        description: "Your Make.com webhook is working correctly.",
+      });
     } catch (error: any) {
       console.error('Webhook test error:', error);
       setWebhookStatus('error');
+      toast({
+        title: "Webhook test failed",
+        description: error.message || "Failed to test webhook connection",
+        variant: "destructive",
+      });
       throw new Error(error.message || "Failed to test webhook connection");
     }
   };
