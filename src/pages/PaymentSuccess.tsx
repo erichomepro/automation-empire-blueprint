@@ -25,7 +25,7 @@ const PaymentSuccess = () => {
   
   useEffect(() => {
     const fetchPaymentStatus = async () => {
-      // Get the purchase ID from the URL when QuickBooks redirects back
+      // Get the purchase ID from the URL
       const purchaseIdFromUrl = searchParams.get('reference');
       console.log('Purchase ID from URL:', purchaseIdFromUrl);
       
@@ -83,7 +83,7 @@ const PaymentSuccess = () => {
       description: "Your ebook is now downloading. Check your downloads folder.",
     });
     
-    // If you had a real download link from Make.com stored in the database:
+    // If you had a real download link stored in the database:
     if (purchaseId) {
       try {
         // Get the current download count

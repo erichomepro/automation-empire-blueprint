@@ -47,7 +47,7 @@ serve(async (req) => {
     
     // Parse request body
     const requestData = await req.json();
-    logStep("Received webhook payload", requestData);
+    logStep("Received payment payload", requestData);
 
     // Log configuration details for debugging (without exposing sensitive info)
     logStep("Configuration", { 
@@ -55,18 +55,18 @@ serve(async (req) => {
       hasServiceKey: !!supabaseServiceKey,
     });
 
-    // Store webhook event directly in the payment_webhook_events table
+    // Store payment event directly in the payment_webhook_events table
     const { data: eventData, error: eventError } = await supabase
       .from("payment_webhook_events")
       .insert([{ payload: requestData }])
       .select();
 
     if (eventError) {
-      logStep("Error storing webhook event", eventError);
-      throw new Error(`Failed to store webhook event: ${eventError.message}`);
+      logStep("Error storing payment event", eventError);
+      throw new Error(`Failed to store payment event: ${eventError.message}`);
     }
 
-    logStep("Successfully stored webhook event", { eventId: eventData?.[0]?.id });
+    logStep("Successfully stored payment event", { eventId: eventData?.[0]?.id });
 
     // If there's a purchase_id in the requestData, update the purchase record
     if (requestData.purchase_id) {
@@ -93,7 +93,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Webhook received and processed",
+        message: "Payment received and processed",
         event_id: eventData?.[0]?.id
       }),
       {
@@ -102,12 +102,12 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    logStep("Error processing webhook", { message: error.message });
+    logStep("Error processing payment", { message: error.message });
     
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message || "Failed to process webhook" 
+        error: error.message || "Failed to process payment" 
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
