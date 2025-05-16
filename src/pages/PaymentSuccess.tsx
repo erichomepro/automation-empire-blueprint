@@ -23,8 +23,6 @@ const PaymentSuccess = () => {
     checkConnection();
   }, []);
   
-  // In a real implementation, this would get the purchase ID from the URL
-  // when redirected back from QuickBooks
   useEffect(() => {
     const fetchPaymentStatus = async () => {
       // Get the purchase ID from the URL when QuickBooks redirects back
@@ -33,10 +31,6 @@ const PaymentSuccess = () => {
       
       if (purchaseIdFromUrl) {
         setPurchaseId(purchaseIdFromUrl);
-        
-        // In a real implementation, you would verify the payment status with QuickBooks
-        // For now, we're simulating that the Make.com webhook has processed the payment
-        // and updated our database
         
         try {
           console.log('Checking purchase status for ID:', purchaseIdFromUrl);
@@ -65,15 +59,18 @@ const PaymentSuccess = () => {
           console.error('Failed to check payment status:', error);
         }
       } else {
-        // For demo purposes, we'll assume success without a purchase ID
-        console.log('No purchase ID, assuming success for demo');
-        setDownloadReady(true);
+        // Show error if no purchase ID is provided
+        toast({
+          title: "Error",
+          description: "No purchase reference found. Please return to checkout.",
+          variant: "destructive"
+        });
       }
     };
     
     fetchPaymentStatus();
     document.title = "Thank You! | Automation Empire";
-  }, [searchParams]);
+  }, [searchParams, toast]);
 
   const handleDownload = async () => {
     // In a real implementation, this would:
@@ -114,8 +111,6 @@ const PaymentSuccess = () => {
         console.error('Error updating download stats:', error);
       }
     }
-    
-    // For demo purposes, we'll just show a success message
   };
 
   if (connectionStatus === 'checking') {
@@ -143,6 +138,28 @@ const PaymentSuccess = () => {
             <Button variant="outline" className="mt-2">
               <ArrowLeft className="mr-2" size={16} />
               Back to Homepage
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!purchaseId) {
+    return (
+      <div className="min-h-screen bg-dark flex flex-col items-center justify-center px-4 py-16">
+        <div className="max-w-md w-full bg-slate-900 rounded-xl shadow-lg p-8 border border-slate-800 text-center">
+          <div className="mb-6 flex justify-center">
+            <AlertTriangle className="text-yellow-500" size={64} />
+          </div>
+          <h1 className="text-2xl font-bold mb-2">No Purchase Found</h1>
+          <p className="text-slate-400 mb-6">
+            We couldn't find your purchase information. Please return to checkout.
+          </p>
+          <Link to="/checkout">
+            <Button variant="outline" className="mt-2">
+              <ArrowLeft className="mr-2" size={16} />
+              Return to Checkout
             </Button>
           </Link>
         </div>

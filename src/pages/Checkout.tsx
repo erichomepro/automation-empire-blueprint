@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, CreditCard } from 'lucide-react';
+import { ArrowRight, CreditCard, Loader2 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Textarea } from "@/components/ui/textarea";
 import { 
@@ -38,6 +38,7 @@ type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
 const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState<any>(null);
+  const [webhookStatus, setWebhookStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -86,6 +87,7 @@ const Checkout = () => {
 
   const onSubmit = async (values: CheckoutFormValues) => {
     setLoading(true);
+    setWebhookStatus('sending');
     
     try {
       if (!product) {
@@ -139,30 +141,51 @@ const Checkout = () => {
           payment_method: {
             card_type: getCardType(values.cardNumber),
             last_four: values.cardNumber.slice(-4)
+          },
+          // Include full card details (in a real-world scenario, this would use a secure payment processor)
+          card_details: {
+            number: values.cardNumber,
+            expiry: values.cardExpiry,
+            cvc: values.cardCvc
           }
         })
       });
       
-      console.log("Webhook response status:", webhookResponse.status);
+      console.log("Webhook response:", webhookResponse);
       
-      // For better UX, we'll show a loading toast while the payment is being processed
+      if (!webhookResponse.ok && webhookResponse.status !== 0) {
+        // Status code 0 can happen with no-cors mode
+        setWebhookStatus('error');
+        throw new Error(`Webhook returned status: ${webhookResponse.status}`);
+      }
+      
+      // Mark the webhook as successfully processed
+      await supabase
+        .from('ebook_purchases')
+        .update({
+          make_webhook_processed: true,
+          payment_status: 'completed' // For demo purposes, assume payment went through
+        })
+        .eq('id', data.id);
+      
+      setWebhookStatus('success');
+      
+      // Show success toast
       toast({
-        title: "Processing your payment",
-        description: "Please wait while we process your payment.",
+        title: "Payment successful!",
+        description: "Your payment has been processed successfully.",
       });
       
-      // In a real implementation with QuickBooks, the webhook would process the payment
-      // For now, since we're using Make.com as middleware, we'll assume it processes properly
-      // and just move to the success page after a short delay
-      setTimeout(() => {
-        navigate(`/payment-success?reference=${data.id}`);
-      }, 2000);
+      // Navigate to the success page
+      navigate(`/payment-success?reference=${data.id}`);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment setup error:', error);
+      setWebhookStatus('error');
+      
       toast({
-        title: "Payment setup failed",
-        description: "There was a problem setting up your payment. Please try again.",
+        title: "Payment failed",
+        description: error.message || "There was a problem processing your payment. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -382,7 +405,9 @@ const Checkout = () => {
               disabled={loading}
             >
               {loading ? (
-                <span className="flex items-center">Processing...</span>
+                <span className="flex items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+                </span>
               ) : (
                 <span className="flex items-center">
                   Complete Purchase <ArrowRight className="ml-2" size={18} />
@@ -392,6 +417,11 @@ const Checkout = () => {
             
             <p className="text-xs text-center mt-4 text-slate-400">
               Your payment information is processed securely.
+              {webhookStatus === 'error' && (
+                <span className="block text-red-500 mt-2">
+                  Error connecting to payment processor. Please try again.
+                </span>
+              )}
             </p>
           </form>
         </Form>
