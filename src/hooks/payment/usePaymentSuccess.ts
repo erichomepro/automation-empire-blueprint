@@ -1,113 +1,104 @@
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from "react-router-dom";
-import { supabase, checkSupabaseConnection } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useLocation } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
 
+type ConnectionStatus = 'checking' | 'connected' | 'error';
+
+/**
+ * Hook for handling payment success page logic
+ */
 export const usePaymentSuccess = () => {
-  const [searchParams] = useSearchParams();
-  const [downloadReady, setDownloadReady] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('checking');
   const [purchaseId, setPurchaseId] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'error'>('checking');
-  const { toast } = useToast();
+  const [purchaseData, setPurchaseData] = useState<any | null>(null);
+  const [downloadReady, setDownloadReady] = useState(false);
+  const [bookAsset, setBookAsset] = useState<string | null>(null);
   
+  const location = useLocation();
+
+  // Extract purchase reference from URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const reference = params.get('reference');
+    
+    if (reference) {
+      setPurchaseId(reference);
+    }
+  }, [location]);
+
+  // Check Supabase connection and fetch purchase data
   useEffect(() => {
     const checkConnection = async () => {
-      const isConnected = await checkSupabaseConnection();
-      setConnectionStatus(isConnected ? 'connected' : 'error');
-      console.log('Supabase connection status:', isConnected ? 'connected' : 'error');
-    };
-    
-    checkConnection();
-  }, []);
-  
-  useEffect(() => {
-    const fetchPaymentStatus = async () => {
-      // Get the purchase ID from the URL
-      const purchaseIdFromUrl = searchParams.get('reference');
-      console.log('Purchase ID from URL:', purchaseIdFromUrl);
-      
-      if (purchaseIdFromUrl) {
-        setPurchaseId(purchaseIdFromUrl);
+      try {
+        // Check if we can connect to Supabase
+        const { error: connectionError } = await supabase.from('ebook_purchases').select('count').limit(1);
         
-        try {
-          console.log('Checking purchase status for ID:', purchaseIdFromUrl);
-          // Check if the purchase exists and is marked as paid
+        if (connectionError) {
+          throw connectionError;
+        }
+        
+        setConnectionStatus('connected');
+        
+        // If we have a purchase ID, fetch the purchase data
+        if (purchaseId) {
           const { data, error } = await supabase
             .from('ebook_purchases')
             .select('*')
-            .eq('id', purchaseIdFromUrl)
-            .maybeSingle();
-            
+            .eq('id', purchaseId)
+            .single();
+          
           if (error) {
-            console.error('Error checking purchase:', error);
-            return;
+            console.error("Error fetching purchase:", error);
+          } else if (data) {
+            setPurchaseData(data);
+            setDownloadReady(data.payment_status === 'completed');
           }
-          
-          console.log('Purchase data:', data);
-          
-          if (data && data.payment_status === 'completed') {
-            setDownloadReady(true);
-          } else {
-            // For demo purposes, we'll assume it's ready
-            console.log('Setting download ready for demo');
-            setDownloadReady(true);
-          }
-        } catch (error) {
-          console.error('Failed to check payment status:', error);
         }
-      } else {
-        // Show error if no purchase ID is provided
-        toast({
-          title: "Error",
-          description: "No purchase reference found. Please return to checkout.",
-          variant: "destructive"
-        });
+        
+        // Fetch the latest ebook asset
+        const { data: assetData, error: assetError } = await supabase
+          .from('book_assets')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(1);
+          
+        if (!assetError && assetData && assetData.length > 0) {
+          setBookAsset(assetData[0].asset_url);
+        }
+        
+      } catch (error) {
+        console.error("Connection error:", error);
+        setConnectionStatus('error');
       }
     };
     
-    fetchPaymentStatus();
-    document.title = "Thank You! | Automation Empire";
-  }, [searchParams, toast]);
+    checkConnection();
+  }, [purchaseId]);
 
+  // Function to handle download request
   const handleDownload = async () => {
-    // In a real implementation, this would:
-    // 1. Verify the user has access to this purchase
-    // 2. Update download count in the database
-    // 3. Redirect to the actual file download or provide a signed URL
+    if (!purchaseId || !downloadReady || !bookAsset) return;
     
-    toast({
-      title: "Download started",
-      description: "Your ebook is now downloading. Check your downloads folder.",
-    });
-    
-    // If you had a real download link stored in the database:
-    if (purchaseId) {
-      try {
-        // Get the current download count
-        const { data: purchaseData } = await supabase
-          .from('ebook_purchases')
-          .select('download_count')
-          .eq('id', purchaseId)
-          .maybeSingle();
-        
-        // Increment the download count directly
-        const newCount = (purchaseData?.download_count || 0) + 1;
-        
-        // Update the download count and last_downloaded timestamp
-        await supabase
-          .from('ebook_purchases')
-          .update({
-            download_count: newCount,
-            last_downloaded: new Date().toISOString()
-          })
-          .eq('id', purchaseId);
-          
-        // In a real implementation, you would redirect to the download URL here
-        // window.location.href = downloadUrl;
-      } catch (error) {
-        console.error('Error updating download stats:', error);
+    // Track download in database
+    try {
+      const { error } = await supabase
+        .from('ebook_purchases')
+        .update({ 
+          download_count: (purchaseData?.download_count || 0) + 1,
+          last_downloaded: new Date().toISOString()
+        })
+        .eq('id', purchaseId);
+      
+      if (error) {
+        console.error("Error updating download count:", error);
       }
+      
+      // Redirect to the asset URL for download
+      window.open(bookAsset, '_blank');
+      
+    } catch (error) {
+      console.error("Error handling download:", error);
     }
   };
 
