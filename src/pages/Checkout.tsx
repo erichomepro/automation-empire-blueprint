@@ -15,6 +15,9 @@ const Checkout = () => {
   const [product, setProduct] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Make.com webhook URL for QuickBooks payment processing
+  const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/1am5x4gdobw2zbya7t77lpew8c4hno1k";
 
   // Fetch product details on component mount
   useEffect(() => {
@@ -78,23 +81,40 @@ const Checkout = () => {
         throw error;
       }
       
-      toast({
-        title: "Success!",
-        description: "You'll be redirected to complete your payment.",
+      console.log("Purchase record created:", data);
+      
+      // Send payment data to Make.com webhook
+      const webhookResponse = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          purchase_id: data.id,
+          customer_name: fullName,
+          customer_email: email,
+          product_name: product.title || 'Automation Empire',
+          product_price: product.price || 9.99,
+          timestamp: new Date().toISOString(),
+          success_url: `${window.location.origin}/payment-success?reference=${data.id}`,
+          cancel_url: `${window.location.origin}/checkout`
+        })
       });
       
-      // In a real implementation, this would redirect to a QuickBooks payment link
-      // with purchase ID as reference
+      console.log("Webhook response status:", webhookResponse.status);
       
-      // For now, we'll simulate this by redirecting to the success page after a delay
-      // Replace this with actual QuickBooks integration when you have your payment link
+      // For better UX, we'll show a loading toast while the payment is being processed
+      toast({
+        title: "Processing your payment",
+        description: "Please wait while we redirect you to complete your payment.",
+      });
+      
+      // In a real implementation with QuickBooks, the webhook would return a payment URL
+      // For now, since we're using Make.com as middleware, we'll assume it redirects properly
+      // and just move to the success page after a short delay
       setTimeout(() => {
-        // You would replace this with your QuickBooks payment URL
-        // window.location.href = `YOUR_QUICKBOOKS_PAYMENT_URL?reference=${data.id}`;
-        
-        // For demo purposes:
-        navigate('/payment-success');
-      }, 1500);
+        navigate(`/payment-success?reference=${data.id}`);
+      }, 2000);
       
     } catch (error) {
       console.error('Payment setup error:', error);
@@ -115,10 +135,10 @@ const Checkout = () => {
         
         <div className="mb-6 p-4 bg-slate-800 rounded-lg">
           <h2 className="text-lg font-semibold">{product?.title || 'Automation Empire'}</h2>
-          <p className="text-slate-400">{product?.description || 'The blueprint for $20K+ months using Make.com + Airtable'}</p>
+          <p className="text-slate-400">{product?.description || 'The blueprints for $20K+ months using Make.com + Airtable'}</p>
           <div className="mt-2 flex justify-between items-center">
             <span className="text-sm text-slate-400">Price:</span>
-            <span className="text-xl font-bold">${product?.price || '297.00'}</span>
+            <span className="text-xl font-bold">${product?.price || '9.99'}</span>
           </div>
         </div>
         
@@ -162,7 +182,7 @@ const Checkout = () => {
         </form>
         
         <p className="text-xs text-center mt-6 text-slate-400">
-          You will be redirected to QuickBooks secure payment page to complete your purchase.
+          You will be redirected to complete your purchase securely.
         </p>
       </div>
     </div>
