@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { safeNavigate, sanitizePath } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
 
 const FooterCTA = () => {
   const { ref, inView } = useInView({
@@ -14,27 +13,8 @@ const FooterCTA = () => {
   });
   
   const navigate = useNavigate();
-  const [price, setPrice] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProductPrice = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('ebook_products')
-          .select('price')
-          .eq('sku', 'AE-EBOOK-001')
-          .single();
-          
-        if (!error && data) {
-          setPrice(data.price.toFixed(2));
-        }
-      } catch (error) {
-        console.error('Error fetching product price:', error);
-      }
-    };
-    
-    fetchProductPrice();
-  }, []);
+  // Fixed price for the product
+  const price = "9.99";
 
   const handleCheckout = () => {
     // Always use sanitized paths and our enhanced navigation utility
@@ -64,7 +44,7 @@ const FooterCTA = () => {
           className="btn-action w-full md:w-auto"
         >
           <BookOpen className="mr-2" size={18} />
-          Grab the Book + Templates for ${price || '9.99'} <ArrowRight className="ml-2" size={18} />
+          Grab the Book + Templates for ${price} <ArrowRight className="ml-2" size={18} />
         </Button>
       </div>
     </section>

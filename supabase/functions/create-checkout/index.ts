@@ -31,28 +31,16 @@ serve(async (req) => {
     logStep("Request received");
     
     // Parse request body
-    const { productId, customerName, customerEmail } = await req.json();
-    logStep("Request data", { productId, customerName, customerEmail });
+    const { customerName, customerEmail } = await req.json();
+    logStep("Request data", { customerName, customerEmail });
     
-    if (!productId || !customerName || !customerEmail) {
-      throw new Error("Missing required fields: productId, customerName, customerEmail");
+    if (!customerName || !customerEmail) {
+      throw new Error("Missing required fields: customerName, customerEmail");
     }
 
     // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Get product details from Supabase
-    const { data: product, error: productError } = await supabase
-      .from("ebook_products")
-      .select("*")
-      .eq("id", productId)
-      .maybeSingle();
-    
-    if (productError || !product) {
-      logStep("Error fetching product", productError || "Product not found");
-      throw new Error("Failed to fetch product details");
-    }
-
     // Initialize Stripe with secret key
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
@@ -65,8 +53,7 @@ serve(async (req) => {
       .insert([{
         customer_name: customerName,
         customer_email: customerEmail,
-        product_id: productId,
-        amount: product.price,
+        amount: 9.99, // Default price if not retrieved from product
         payment_status: "pending"
       }])
       .select()
@@ -79,6 +66,10 @@ serve(async (req) => {
     
     logStep("Purchase record created", { purchaseId: purchaseData.id });
 
+    // Use the specific product ID provided by the user
+    const productId = "prod_SJrKv0Vxdw6nhP";
+    logStep("Using specific Stripe product ID", { productId });
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -86,11 +77,8 @@ serve(async (req) => {
         {
           price_data: {
             currency: "usd",
-            product_data: {
-              name: product.title,
-              description: product.description || "Digital Product",
-            },
-            unit_amount: Math.round(product.price * 100), // Convert to cents
+            product: productId, // Use the specific product ID
+            unit_amount: 999, // $9.99 in cents
           },
           quantity: 1,
         },
@@ -102,7 +90,6 @@ serve(async (req) => {
       customer_email: customerEmail,
       metadata: {
         purchase_id: purchaseData.id,
-        product_id: productId,
       },
     });
 

@@ -12,7 +12,6 @@ const Checkout = () => {
   const {
     form,
     loading,
-    product,
     onSubmit,
     formatCardNumber,
     formatCardExpiry,
@@ -23,7 +22,7 @@ const Checkout = () => {
       <div className="max-w-md mx-auto bg-slate-900 rounded-xl shadow-lg p-6 border border-slate-800">
         <h1 className="text-2xl font-bold mb-6 text-center">Complete Your Purchase</h1>
         
-        <ProductSummary product={product} />
+        <ProductSummary />
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
