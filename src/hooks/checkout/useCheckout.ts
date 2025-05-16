@@ -11,7 +11,12 @@ export const useCheckout = () => {
   const { loading, processPayment } = useStripeCheckout();
 
   const onSubmit = async (values: CheckoutFormValues) => {
-    await processPayment(values);
+    // Extract name and email from the form values
+    const customerName = values.fullName || "";
+    const customerEmail = values.email || "";
+    
+    // Call processPayment with the extracted values
+    await processPayment(customerName, customerEmail);
   };
 
   return {

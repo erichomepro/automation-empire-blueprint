@@ -1,4 +1,14 @@
+
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 import { NavigateFunction } from "react-router-dom";
+
+/**
+ * Combines class names with Tailwind CSS using clsx and tailwind-merge
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 /**
  * Sanitizes a URL path to prevent parsing errors, especially on mobile devices
