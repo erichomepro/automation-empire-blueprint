@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -101,15 +100,19 @@ export const useCheckout = () => {
         })
       });
       
-      console.log("Test webhook response:", webhookResponse);
+      console.log("Test webhook response status:", webhookResponse.status);
       
       if (!webhookResponse.ok) {
         setWebhookStatus('error');
-        const errorData = await webhookResponse.json().catch(() => ({}));
+        const errorData = await webhookResponse.json().catch(() => ({ error: `Status code: ${webhookResponse.status}` }));
         throw new Error(`Webhook test failed: ${webhookResponse.status} - ${errorData.error || 'Unknown error'}`);
       }
       
-      const responseData = await webhookResponse.json();
+      const responseData = await webhookResponse.json().catch(error => {
+        console.error("Error parsing webhook response JSON:", error);
+        throw new Error("Invalid JSON response from webhook");
+      });
+      
       console.log("Webhook test response data:", responseData);
       
       setWebhookStatus('success');
@@ -203,11 +206,29 @@ export const useCheckout = () => {
       
       if (!webhookResponse.ok) {
         setWebhookStatus('error');
-        const errorData = await webhookResponse.json().catch(() => ({}));
-        throw new Error(`Payment processing failed: ${webhookResponse.status} - ${errorData.error || 'Unknown error'}`);
+        const errorText = await webhookResponse.text();
+        console.error("Raw webhook response:", errorText);
+        try {
+          // Try to parse as JSON if it's a valid JSON response
+          const errorData = JSON.parse(errorText);
+          throw new Error(`Payment processing failed: ${webhookResponse.status} - ${errorData.error || 'Unknown error'}`);
+        } catch (parseError) {
+          // If it's not a valid JSON, show the raw text or status code
+          throw new Error(`Payment processing failed: ${webhookResponse.status} - Non-JSON response received`);
+        }
       }
       
-      const responseData = await webhookResponse.json();
+      // Try to parse response as JSON safely
+      let responseData;
+      try {
+        const responseText = await webhookResponse.text();
+        console.log("Raw webhook response text:", responseText);
+        responseData = JSON.parse(responseText);
+      } catch (jsonError) {
+        console.error("Failed to parse webhook response as JSON:", jsonError);
+        throw new Error("Invalid response from payment server");
+      }
+      
       console.log("Payment webhook response data:", responseData);
       
       if (!responseData.success) {
