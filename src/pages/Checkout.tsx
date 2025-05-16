@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Form } from "@/components/ui/form";
-import { useCheckout } from "@/hooks/useCheckout";
+import { useCheckout } from "@/hooks/checkout/useCheckout";
 import ProductSummary from "@/components/checkout/ProductSummary";
 import CustomerInfoFields from "@/components/checkout/CustomerInfoFields";
 import BillingAddressFields from "@/components/checkout/BillingAddressFields";
