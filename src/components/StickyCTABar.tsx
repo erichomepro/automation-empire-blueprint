@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { navigateToSection } from "@/lib/navigation";
+import { safeNavigate, sanitizePath } from "@/lib/utils";
 
 const StickyCTABar = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -21,7 +21,9 @@ const StickyCTABar = () => {
   }, []);
 
   const scrollToCheckout = () => {
-    navigateToSection('checkout', navigate, '/checkout');
+    const sanitizedPath = sanitizePath('/checkout');
+    console.log("Sticky CTA: Navigate to checkout path:", sanitizedPath);
+    safeNavigate(navigate, sanitizedPath);
   };
 
   return (

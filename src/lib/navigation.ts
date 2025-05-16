@@ -49,6 +49,23 @@ export const navigateToSection = (
     }
   } catch (error) {
     console.error("[navigateToSection] Navigation error:", error);
-    // We could add visual recovery UI here in a future update
+  }
+};
+
+/**
+ * Enhanced navigation function with built-in error handling
+ */
+export const safeNavigate = (navigate: NavigateFunction, path: string) => {
+  try {
+    console.log(`[safeNavigate] Navigating to: ${path}`);
+    navigate(path);
+  } catch (error) {
+    console.error("[safeNavigate] Navigation failed:", error);
+    // Fallback to direct location change if navigate fails
+    try {
+      window.location.href = path;
+    } catch (innerError) {
+      console.error("[safeNavigate] Even direct location change failed:", innerError);
+    }
   }
 };
