@@ -49,6 +49,11 @@ export const useCheckout = () => {
           return;
         }
         
+        // Override the product price for testing
+        if (data) {
+          data.price = 0.50; // Set price to $0.50 for testing
+        }
+        
         setProduct(data);
       } catch (error) {
         console.error('Failed to fetch product:', error);
@@ -141,7 +146,7 @@ export const useCheckout = () => {
             customer_name: values.fullName,
             customer_email: values.email,
             product_id: product.id,
-            amount: product.price,
+            amount: 0.50, // Use the testing amount of $0.50 explicitly here too
             payment_status: 'pending'
           }
         ])
@@ -166,7 +171,7 @@ export const useCheckout = () => {
           customer_name: values.fullName,
           customer_email: values.email,
           product_name: product.title || 'Automation Empire',
-          product_price: product.price || 9.99,
+          product_price: 0.50, // Use the testing amount of $0.50
           timestamp: new Date().toISOString(),
           success_url: `${window.location.origin}/payment-success?reference=${data.id}`,
           cancel_url: `${window.location.origin}/checkout`,

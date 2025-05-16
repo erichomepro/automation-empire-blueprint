@@ -16,7 +16,7 @@ const ProductSummary = ({ product }: ProductSummaryProps) => {
       <p className="text-slate-400">{product?.description || 'The blueprints for $20K+ months using Make.com + Airtable'}</p>
       <div className="mt-2 flex justify-between items-center">
         <span className="text-sm text-slate-400">Price:</span>
-        <span className="text-xl font-bold">${product?.price || '9.99'}</span>
+        <span className="text-xl font-bold">${(product?.price || 0.50).toFixed(2)} <span className="text-xs text-green-400 ml-1">(Test Price)</span></span>
       </div>
     </div>
   );
