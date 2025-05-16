@@ -17,10 +17,10 @@ const CheckoutButton = ({ loading, testWebhook, webhookStatus }: CheckoutButtonP
     if (testWebhook) {
       try {
         await testWebhook();
-        // Success toast is now handled in the testWebhook function
+        // Success toast is handled in the testWebhook function
       } catch (error) {
         console.error("Test webhook error in button component:", error);
-        // Error toast is now handled in the testWebhook function
+        // Error toast is handled in the testWebhook function
       }
     }
   };
@@ -58,7 +58,7 @@ const CheckoutButton = ({ loading, testWebhook, webhookStatus }: CheckoutButtonP
               </>
             ) : (
               <>
-                <Wifi className="mr-2 h-4 w-4" /> Test Make.com Webhook
+                <Wifi className="mr-2 h-4 w-4" /> Test Supabase Webhook
               </>
             )}
           </span>
@@ -67,13 +67,13 @@ const CheckoutButton = ({ loading, testWebhook, webhookStatus }: CheckoutButtonP
       
       {webhookStatus === 'error' && (
         <p className="text-xs text-red-500 text-center mt-1">
-          Webhook test failed. Please check your webhook URL and Make.com scenario.
+          Webhook test failed. Please check the Supabase Edge Function logs.
         </p>
       )}
       
       {webhookStatus === 'success' && (
         <p className="text-xs text-green-500 text-center mt-1">
-          Webhook test successful!
+          Webhook test successful! Data stored in Supabase.
         </p>
       )}
     </>

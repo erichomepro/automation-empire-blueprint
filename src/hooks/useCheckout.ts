@@ -8,9 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkoutFormSchema, CheckoutFormValues } from "@/types/checkout";
 import { getCardType } from "@/utils/checkoutUtils";
 
-// Make.com webhook URL for QuickBooks payment processing
-// Corrected webhook URL
-const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/1am5x4gdobw2zbya7t77lpew8c4hno1k"; 
+// Supabase payment webhook function URL
+const PAYMENT_WEBHOOK_URL = "https://wmslhycsuhuxfjejjxze.supabase.co/functions/v1/payment-webhook";
 
 export const useCheckout = () => {
   const [loading, setLoading] = useState(false);
@@ -82,10 +81,10 @@ export const useCheckout = () => {
     setWebhookStatus('sending');
     
     try {
-      console.log("Testing webhook:", MAKE_WEBHOOK_URL);
+      console.log("Testing webhook:", PAYMENT_WEBHOOK_URL);
       
-      // Send a test payload to the webhook - fixed URL format
-      const webhookResponse = await fetch(MAKE_WEBHOOK_URL, {
+      // Send a test payload to our Supabase webhook function
+      const webhookResponse = await fetch(PAYMENT_WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -99,16 +98,19 @@ export const useCheckout = () => {
       
       console.log("Test webhook response:", webhookResponse);
       
-      if (webhookResponse.status >= 400) {
-        // Handle error status codes properly
+      if (!webhookResponse.ok) {
         setWebhookStatus('error');
-        throw new Error(`Webhook test returned status: ${webhookResponse.status}`);
+        const errorData = await webhookResponse.json().catch(() => ({}));
+        throw new Error(`Webhook test failed: ${webhookResponse.status} - ${errorData.error || 'Unknown error'}`);
       }
+      
+      const responseData = await webhookResponse.json();
+      console.log("Webhook test response data:", responseData);
       
       setWebhookStatus('success');
       toast({
         title: "Webhook test successful",
-        description: "Your Make.com webhook is working correctly.",
+        description: "Your webhook integration is working correctly.",
       });
     } catch (error: any) {
       console.error('Webhook test error:', error);
@@ -151,10 +153,10 @@ export const useCheckout = () => {
       }
       
       console.log("Purchase record created:", data);
-      console.log("Sending payment data to webhook:", MAKE_WEBHOOK_URL);
+      console.log("Sending payment data to webhook:", PAYMENT_WEBHOOK_URL);
       
-      // Send payment data to Make.com webhook - fixed URL format
-      const webhookResponse = await fetch(MAKE_WEBHOOK_URL, {
+      // Send payment data to our Supabase webhook function
+      const webhookResponse = await fetch(PAYMENT_WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -191,11 +193,14 @@ export const useCheckout = () => {
       
       console.log("Webhook response status:", webhookResponse.status);
       
-      if (webhookResponse.status >= 400) {
-        // Handle error status codes properly
+      if (!webhookResponse.ok) {
         setWebhookStatus('error');
-        throw new Error(`Webhook returned status: ${webhookResponse.status}`);
+        const errorData = await webhookResponse.json().catch(() => ({}));
+        throw new Error(`Payment processing failed: ${webhookResponse.status} - ${errorData.error || 'Unknown error'}`);
       }
+      
+      const responseData = await webhookResponse.json();
+      console.log("Payment webhook response data:", responseData);
       
       // Mark the webhook as successfully processed
       await supabase

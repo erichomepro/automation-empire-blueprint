@@ -605,6 +605,30 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_webhook_events: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       strategy_call_bookings: {
         Row: {
           company_name: string
@@ -762,6 +786,10 @@ export type Database = {
           status: string
           website: string | null
         }[]
+      }
+      insert_webhook_event: {
+        Args: { event_payload: Json }
+        Returns: string
       }
     }
     Enums: {
