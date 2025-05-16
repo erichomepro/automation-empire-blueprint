@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
 import { checkoutFormSchema, CheckoutFormValues } from "@/types/checkout";
-import { getCardType, formatCardExpiry } from "@/utils/checkoutUtils";
+import { getCardType } from "@/utils/checkoutUtils";
 
 // Make.com webhook URL for QuickBooks payment processing
 const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/1am5x4gdobw2zbya7t77lpew8c4hno1k";
@@ -64,8 +64,20 @@ export const useCheckout = () => {
     form.setValue('cardNumber', input);
   };
 
+  // Format card expiry as MM/YY
+  const formatCardExpiry = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value.replace(/\D/g, '');
+    
+    if (input.length > 2) {
+      const formattedValue = `${input.substring(0, 2)}/${input.substring(2, 4)}`;
+      form.setValue('cardExpiry', formattedValue);
+    } else {
+      form.setValue('cardExpiry', input);
+    }
+  };
+
   // Test webhook connection
-  const testWebhook = async () => {
+  const testWebhook = async (): Promise<void> => {
     setWebhookStatus('sending');
     
     try {
@@ -91,7 +103,6 @@ export const useCheckout = () => {
       }
       
       setWebhookStatus('success');
-      return true;
     } catch (error: any) {
       console.error('Webhook test error:', error);
       setWebhookStatus('error');

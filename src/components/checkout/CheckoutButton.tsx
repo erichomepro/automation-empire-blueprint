@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface CheckoutButtonProps {
   loading: boolean;
-  testWebhook?: () => Promise<void>;
+  testWebhook?: () => Promise<boolean | void>;
   webhookStatus?: 'idle' | 'sending' | 'success' | 'error';
 }
 

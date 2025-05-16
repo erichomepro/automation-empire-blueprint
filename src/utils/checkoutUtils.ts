@@ -12,7 +12,8 @@ export const getCardType = (cardNumber: string): string => {
 };
 
 // Helper function to format card expiry as MM/YY
-export const formatCardExpiry = (input: string): string => {
+export const formatCardExpiry = (e: React.ChangeEvent<HTMLInputElement>): string => {
+  const input = e.target.value;
   const cleaned = input.replace(/\D/g, '');
   
   if (cleaned.length > 2) {
