@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface CheckoutButtonProps {
   loading: boolean;
-  testWebhook?: () => Promise<boolean | void>;
+  testWebhook?: () => Promise<void>;
   webhookStatus?: 'idle' | 'sending' | 'success' | 'error';
 }
 
@@ -17,13 +17,10 @@ const CheckoutButton = ({ loading, testWebhook, webhookStatus }: CheckoutButtonP
     if (testWebhook) {
       try {
         await testWebhook();
-        // The toast is already handled in the testWebhook function via the webhookStatus
+        // Success toast is now handled in the testWebhook function
       } catch (error) {
-        toast({
-          title: "Webhook test failed",
-          description: error instanceof Error ? error.message : "Check your Make.com webhook URL and scenario settings",
-          variant: "destructive",
-        });
+        console.error("Test webhook error in button component:", error);
+        // Error toast is now handled in the testWebhook function
       }
     }
   };

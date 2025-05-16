@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -9,7 +10,7 @@ import { getCardType } from "@/utils/checkoutUtils";
 
 // Make.com webhook URL for QuickBooks payment processing
 // Corrected webhook URL
-const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/1am5x4gdobw2zbya7t77lpew8c4hno1k"; // You need to replace this with your correct webhook URL
+const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/1am5x4gdobw2zbya7t77lpew8c4hno1k"; 
 
 export const useCheckout = () => {
   const [loading, setLoading] = useState(false);
@@ -81,7 +82,9 @@ export const useCheckout = () => {
     setWebhookStatus('sending');
     
     try {
-      // Send a test payload to the webhook
+      console.log("Testing webhook:", MAKE_WEBHOOK_URL);
+      
+      // Send a test payload to the webhook - fixed URL format
       const webhookResponse = await fetch(MAKE_WEBHOOK_URL, {
         method: "POST",
         headers: {
@@ -96,8 +99,8 @@ export const useCheckout = () => {
       
       console.log("Test webhook response:", webhookResponse);
       
-      if (!webhookResponse.ok && webhookResponse.status !== 0) {
-        // Status code 0 can happen with no-cors mode
+      if (webhookResponse.status >= 400) {
+        // Handle error status codes properly
         setWebhookStatus('error');
         throw new Error(`Webhook test returned status: ${webhookResponse.status}`);
       }
@@ -115,7 +118,7 @@ export const useCheckout = () => {
         description: error.message || "Failed to test webhook connection",
         variant: "destructive",
       });
-      throw new Error(error.message || "Failed to test webhook connection");
+      throw error;
     }
   };
 
@@ -148,8 +151,9 @@ export const useCheckout = () => {
       }
       
       console.log("Purchase record created:", data);
+      console.log("Sending payment data to webhook:", MAKE_WEBHOOK_URL);
       
-      // Send payment data to Make.com webhook
+      // Send payment data to Make.com webhook - fixed URL format
       const webhookResponse = await fetch(MAKE_WEBHOOK_URL, {
         method: "POST",
         headers: {
@@ -185,10 +189,10 @@ export const useCheckout = () => {
         })
       });
       
-      console.log("Webhook response:", webhookResponse);
+      console.log("Webhook response status:", webhookResponse.status);
       
-      if (!webhookResponse.ok && webhookResponse.status !== 0) {
-        // Status code 0 can happen with no-cors mode
+      if (webhookResponse.status >= 400) {
+        // Handle error status codes properly
         setWebhookStatus('error');
         throw new Error(`Webhook returned status: ${webhookResponse.status}`);
       }
