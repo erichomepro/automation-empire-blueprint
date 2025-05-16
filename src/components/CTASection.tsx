@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
 import { Download, Clock, Mail, FileCheck, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const CTASection = () => {
   const { ref, inView } = useInView({
@@ -11,6 +12,7 @@ const CTASection = () => {
     triggerOnce: true
   });
   
+  const navigate = useNavigate();
   const { toast } = useToast();
   
   const [timeLeft, setTimeLeft] = useState({
@@ -48,10 +50,8 @@ const CTASection = () => {
   }, []);
   
   const handlePurchase = () => {
-    toast({
-      title: "Purchase successful!",
-      description: "Thank you for purchasing Automation Empire. Check your email for download instructions."
-    });
+    // Navigate to checkout page instead of showing toast
+    navigate('/checkout');
   };
   
   return (
