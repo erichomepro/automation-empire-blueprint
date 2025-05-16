@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -9,7 +8,8 @@ import { checkoutFormSchema, CheckoutFormValues } from "@/types/checkout";
 import { getCardType } from "@/utils/checkoutUtils";
 
 // Make.com webhook URL for QuickBooks payment processing
-const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/1am5x4gdobw2zbya7t77lpew8c4hno1k";
+// Updated webhook URL - previous one was returning 404
+const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/12345abcdef"; // You need to replace this with your correct webhook URL
 
 export const useCheckout = () => {
   const [loading, setLoading] = useState(false);

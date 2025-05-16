@@ -17,14 +17,11 @@ const CheckoutButton = ({ loading, testWebhook, webhookStatus }: CheckoutButtonP
     if (testWebhook) {
       try {
         await testWebhook();
-        toast({
-          title: "Webhook test sent",
-          description: "Check your Make.com scenario logs to verify it was received.",
-        });
+        // The toast is already handled in the testWebhook function via the webhookStatus
       } catch (error) {
         toast({
           title: "Webhook test failed",
-          description: error instanceof Error ? error.message : "Unknown error occurred",
+          description: error instanceof Error ? error.message : "Check your Make.com webhook URL and scenario settings",
           variant: "destructive",
         });
       }
@@ -73,7 +70,7 @@ const CheckoutButton = ({ loading, testWebhook, webhookStatus }: CheckoutButtonP
       
       {webhookStatus === 'error' && (
         <p className="text-xs text-red-500 text-center mt-1">
-          Webhook test failed. Check your URL and Make.com scenario.
+          Webhook test failed. Please check your webhook URL and Make.com scenario.
         </p>
       )}
       
