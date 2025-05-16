@@ -13,11 +13,9 @@ const Checkout = () => {
     form,
     loading,
     product,
-    webhookStatus,
     onSubmit,
     formatCardNumber,
     formatCardExpiry,
-    testWebhook
   } = useCheckout();
 
   return (
@@ -37,19 +35,10 @@ const Checkout = () => {
               formatCardExpiry={formatCardExpiry}
             />
             
-            <CheckoutButton 
-              loading={loading} 
-              testWebhook={testWebhook}
-              webhookStatus={webhookStatus}
-            />
+            <CheckoutButton loading={loading} />
             
             <p className="text-xs text-center mt-4 text-slate-400">
               Your payment information is processed securely.
-              {webhookStatus === 'error' && (
-                <span className="block text-red-500 mt-2">
-                  Error connecting to payment processor. Please try again.
-                </span>
-              )}
             </p>
           </form>
         </Form>

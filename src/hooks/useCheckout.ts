@@ -14,7 +14,6 @@ const PAYMENT_WEBHOOK_URL = "https://wmslhycsuhuxfjejjxze.supabase.co/functions/
 export const useCheckout = () => {
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState<any>(null);
-  const [webhookStatus, setWebhookStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -115,52 +114,8 @@ export const useCheckout = () => {
     }
   };
 
-  // Test webhook connection
-  const testWebhook = async (): Promise<void> => {
-    setWebhookStatus('sending');
-    
-    try {
-      console.log("Testing webhook:", PAYMENT_WEBHOOK_URL);
-      
-      // Send a test payload to our Supabase webhook function
-      const webhookResponse = await fetch(PAYMENT_WEBHOOK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          test: true,
-          timestamp: new Date().toISOString(),
-          message: "This is a test from the Automation Empire checkout page"
-        })
-      });
-      
-      console.log("Test webhook response status:", webhookResponse.status);
-      
-      // Use the helper function to safely handle the response
-      const responseData = await handleWebhookResponse(webhookResponse);
-      console.log("Webhook test response data:", responseData);
-      
-      setWebhookStatus('success');
-      toast({
-        title: "Webhook test successful",
-        description: "Your webhook integration is working correctly.",
-      });
-    } catch (error: any) {
-      console.error('Webhook test error:', error);
-      setWebhookStatus('error');
-      toast({
-        title: "Webhook test failed",
-        description: error.message || "Failed to test webhook connection",
-        variant: "destructive",
-      });
-      throw error;
-    }
-  };
-
   const onSubmit = async (values: CheckoutFormValues) => {
     setLoading(true);
-    setWebhookStatus('sending');
     
     try {
       if (!product) {
@@ -243,8 +198,6 @@ export const useCheckout = () => {
         throw new Error(responseData.error || "Payment processing failed on server");
       }
       
-      setWebhookStatus('success');
-      
       // Show success toast
       toast({
         title: "Payment successful!",
@@ -256,7 +209,6 @@ export const useCheckout = () => {
       
     } catch (error: any) {
       console.error('Payment setup error:', error);
-      setWebhookStatus('error');
       
       toast({
         title: "Payment failed",
@@ -272,10 +224,8 @@ export const useCheckout = () => {
     form,
     loading,
     product,
-    webhookStatus,
     onSubmit,
     formatCardNumber,
-    formatCardExpiry,
-    testWebhook
+    formatCardExpiry
   };
 };
