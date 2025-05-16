@@ -90,6 +90,7 @@ serve(async (req) => {
       customer_email: customerEmail,
       metadata: {
         purchase_id: purchaseData.id,
+        customer_name: customerName
       },
     });
 

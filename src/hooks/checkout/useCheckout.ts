@@ -11,8 +11,8 @@ export const useCheckout = () => {
   const { loading, processPayment } = useStripeCheckout();
 
   const onSubmit = async (values: CheckoutFormValues) => {
-    // Extract name and email from the form values
-    const customerName = values.fullName || "";
+    // Combine first and last name to create full name
+    const customerName = `${values.firstName} ${values.lastName}`.trim();
     const customerEmail = values.email || "";
     
     // Call processPayment with the extracted values

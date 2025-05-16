@@ -1,9 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Loader2 } from 'lucide-react';
 import { useStripeCheckout } from "@/hooks/checkout/useStripeCheckout";
+import { useNavigate } from 'react-router-dom';
 
 const FooterCTA = () => {
   const { ref, inView } = useInView({
@@ -11,13 +12,14 @@ const FooterCTA = () => {
     triggerOnce: true,
   });
   
-  const { processPayment, loading } = useStripeCheckout();
+  const navigate = useNavigate();
+  const { loading } = useStripeCheckout();
   // Fixed price for the product
   const price = "9.99";
 
   const handlePurchase = () => {
-    console.log("Footer CTA: Starting direct checkout");
-    processPayment();
+    console.log("Footer CTA: Navigating to checkout page");
+    navigate('/checkout');
   };
 
   return (
