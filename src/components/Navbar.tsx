@@ -54,13 +54,6 @@ const Navbar = () => {
             >
               FAQ
             </Button>
-            <Button 
-              variant="ghost" 
-              className="text-light hover:text-accent hover:bg-transparent"
-              onClick={() => navigate('/admin')}
-            >
-              Admin
-            </Button>
           </nav>
           <Button 
             className="bg-accent text-dark font-bold hover:bg-opacity-90 transition-all"
