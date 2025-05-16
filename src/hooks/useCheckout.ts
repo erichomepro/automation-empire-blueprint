@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkoutFormSchema, CheckoutFormValues } from "@/types/checkout";
 import { getCardType } from "@/utils/checkoutUtils";
 
-// Supabase payment webhook function URL - Fix the URL formatting
+// Supabase payment webhook function URL
 const PAYMENT_WEBHOOK_URL = "https://wmslhycsuhuxfjejjxze.supabase.co/functions/v1/payment-webhook";
 
 export const useCheckout = () => {
@@ -138,6 +138,8 @@ export const useCheckout = () => {
         throw new Error("Product information not available");
       }
       
+      console.log("Processing checkout for:", values.fullName, values.email);
+      
       // Store the pending purchase in Supabase
       const { data, error } = await supabase
         .from('ebook_purchases')
@@ -154,13 +156,14 @@ export const useCheckout = () => {
         .single();
       
       if (error) {
+        console.error("Error creating purchase record:", error);
         throw error;
       }
       
       console.log("Purchase record created:", data);
       console.log("Sending payment data to webhook:", PAYMENT_WEBHOOK_URL);
       
-      // Send payment data to our Supabase webhook function - fix URL formatting issue
+      // Send payment data to our Supabase webhook function
       const webhookResponse = await fetch(PAYMENT_WEBHOOK_URL, {
         method: "POST",
         headers: {
@@ -207,14 +210,9 @@ export const useCheckout = () => {
       const responseData = await webhookResponse.json();
       console.log("Payment webhook response data:", responseData);
       
-      // Mark the webhook as successfully processed
-      await supabase
-        .from('ebook_purchases')
-        .update({
-          make_webhook_processed: true,
-          payment_status: 'completed' // For demo purposes, assume payment went through
-        })
-        .eq('id', data.id);
+      if (!responseData.success) {
+        throw new Error(responseData.error || "Payment processing failed on server");
+      }
       
       setWebhookStatus('success');
       

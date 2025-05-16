@@ -38,15 +38,35 @@ serve(async (req) => {
     const requestData = await req.json();
     console.log("Received webhook payload:", requestData);
 
-    // Store webhook event in the database
-    const { data: eventData, error: eventError } = await supabase.rpc(
-      "insert_webhook_event",
-      { event_payload: requestData }
-    );
+    // Store webhook event directly in the payment_webhook_events table
+    const { data: eventData, error: eventError } = await supabase
+      .from("payment_webhook_events")
+      .insert([{ payload: requestData }])
+      .select();
 
     if (eventError) {
       console.error("Error storing webhook event:", eventError);
       throw eventError;
+    }
+
+    console.log("Successfully stored webhook event:", eventData);
+
+    // If there's a purchase_id in the requestData, update the purchase record
+    if (requestData.purchase_id) {
+      const { error: purchaseError } = await supabase
+        .from("ebook_purchases")
+        .update({
+          payment_status: 'completed',
+          make_webhook_processed: true
+        })
+        .eq('id', requestData.purchase_id);
+
+      if (purchaseError) {
+        console.error("Error updating purchase record:", purchaseError);
+        // Continue processing even if this update fails
+      } else {
+        console.log("Successfully updated purchase record:", requestData.purchase_id);
+      }
     }
 
     // If Make.com webhook URL is configured, also forward the data there
@@ -58,7 +78,7 @@ serve(async (req) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...requestData,
-            supabase_event_id: eventData
+            supabase_event_id: eventData[0].id
           })
         });
         
@@ -74,7 +94,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: "Webhook received and processed",
-        event_id: eventData
+        event_id: eventData?.[0]?.id
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
