@@ -4,17 +4,13 @@ import { Form } from "@/components/ui/form";
 import { useCheckout } from "@/hooks/checkout/useCheckout";
 import ProductSummary from "@/components/checkout/ProductSummary";
 import CustomerInfoFields from "@/components/checkout/CustomerInfoFields";
-import BillingAddressFields from "@/components/checkout/BillingAddressFields";
-import PaymentInfoFields from "@/components/checkout/PaymentInfoFields";
 import CheckoutButton from "@/components/checkout/CheckoutButton";
 
 const Checkout = () => {
   const {
     form,
     loading,
-    onSubmit,
-    formatCardNumber,
-    formatCardExpiry,
+    onSubmit
   } = useCheckout();
 
   return (
@@ -27,17 +23,11 @@ const Checkout = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <CustomerInfoFields form={form} />
-            <BillingAddressFields form={form} />
-            <PaymentInfoFields
-              form={form}
-              formatCardNumber={formatCardNumber}
-              formatCardExpiry={formatCardExpiry}
-            />
             
             <CheckoutButton loading={loading} />
             
             <p className="text-xs text-center mt-4 text-slate-400">
-              Your payment information is processed securely.
+              Your email is needed to deliver your digital purchase. We won't share it with anyone else.
             </p>
           </form>
         </Form>

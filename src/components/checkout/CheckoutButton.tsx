@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowRight } from 'lucide-react';
+import { Loader2, Download } from 'lucide-react';
 
 interface CheckoutButtonProps {
   loading: boolean;
@@ -20,7 +20,7 @@ const CheckoutButton = ({ loading }: CheckoutButtonProps) => {
         </span>
       ) : (
         <span className="flex items-center">
-          Proceed to Secure Checkout <ArrowRight className="ml-2" size={18} />
+          Get Your Book <Download className="ml-2" size={18} />
         </span>
       )}
     </Button>
