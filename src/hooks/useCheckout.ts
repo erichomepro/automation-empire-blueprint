@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
 import { checkoutFormSchema, CheckoutFormValues } from "@/types/checkout";
-import { getCardType } from "@/utils/checkoutUtils";
+import { getCardType, formatCardExpiry } from "@/utils/checkoutUtils";
 
 // Make.com webhook URL for QuickBooks payment processing
 const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/1am5x4gdobw2zbya7t77lpew8c4hno1k";
@@ -64,16 +64,39 @@ export const useCheckout = () => {
     form.setValue('cardNumber', input);
   };
 
-  // Format card expiry as MM/YY
-  const formatCardExpiry = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value.replace(/\D/g, '');
-    let formatted = input;
+  // Test webhook connection
+  const testWebhook = async () => {
+    setWebhookStatus('sending');
     
-    if (input.length > 2) {
-      formatted = `${input.substring(0, 2)}/${input.substring(2, 4)}`;
+    try {
+      // Send a test payload to the webhook
+      const webhookResponse = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          test: true,
+          timestamp: new Date().toISOString(),
+          message: "This is a test from the Automation Empire checkout page"
+        })
+      });
+      
+      console.log("Test webhook response:", webhookResponse);
+      
+      if (!webhookResponse.ok && webhookResponse.status !== 0) {
+        // Status code 0 can happen with no-cors mode
+        setWebhookStatus('error');
+        throw new Error(`Webhook test returned status: ${webhookResponse.status}`);
+      }
+      
+      setWebhookStatus('success');
+      return true;
+    } catch (error: any) {
+      console.error('Webhook test error:', error);
+      setWebhookStatus('error');
+      throw new Error(error.message || "Failed to test webhook connection");
     }
-    
-    form.setValue('cardExpiry', formatted);
   };
 
   const onSubmit = async (values: CheckoutFormValues) => {
@@ -191,6 +214,7 @@ export const useCheckout = () => {
     webhookStatus,
     onSubmit,
     formatCardNumber,
-    formatCardExpiry
+    formatCardExpiry,
+    testWebhook
   };
 };

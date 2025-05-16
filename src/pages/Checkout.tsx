@@ -16,7 +16,8 @@ const Checkout = () => {
     webhookStatus,
     onSubmit,
     formatCardNumber,
-    formatCardExpiry
+    formatCardExpiry,
+    testWebhook
   } = useCheckout();
 
   return (
@@ -36,7 +37,11 @@ const Checkout = () => {
               formatCardExpiry={formatCardExpiry}
             />
             
-            <CheckoutButton loading={loading} />
+            <CheckoutButton 
+              loading={loading} 
+              testWebhook={testWebhook}
+              webhookStatus={webhookStatus}
+            />
             
             <p className="text-xs text-center mt-4 text-slate-400">
               Your payment information is processed securely.
